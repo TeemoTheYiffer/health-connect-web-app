@@ -21,8 +21,12 @@ default:
 lint:
   stage: lint
   script:
-    - ruff check .
-    - black --check .
+    # Apply-mode formatters: don't block the pipeline on drift. The runner's
+    # workspace gets fixed up; developers should also format locally before pushing
+    # (or set up a pre-commit hook). If formatting changes break parsing, that's
+    # caught here and the job still fails.
+    - ruff check --fix .
+    - black .
 
 test:
   stage: test

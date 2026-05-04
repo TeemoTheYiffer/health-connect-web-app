@@ -2,6 +2,7 @@
 
 Kept deliberately simple: each function returns plain dicts/lists ready for Jinja.
 """
+
 from __future__ import annotations
 
 from dataclasses import dataclass
@@ -36,37 +37,27 @@ def latest_blood_pressure(s: Session) -> m.BloodPressure | None:
 def recent_blood_pressure(s: Session, days: int = 90) -> list[m.BloodPressure]:
     return list(
         s.execute(
-            select(m.BloodPressure)
-            .where(m.BloodPressure.time >= _ago(days))
-            .order_by(m.BloodPressure.time)
+            select(m.BloodPressure).where(m.BloodPressure.time >= _ago(days)).order_by(m.BloodPressure.time)
         ).scalars()
     )
 
 
 def latest_weight(s: Session) -> m.Weight | None:
-    return s.execute(
-        select(m.Weight).order_by(desc(m.Weight.time)).limit(1)
-    ).scalar_one_or_none()
+    return s.execute(select(m.Weight).order_by(desc(m.Weight.time)).limit(1)).scalar_one_or_none()
 
 
 def recent_weight(s: Session, days: int = 180) -> list[m.Weight]:
     return list(
-        s.execute(
-            select(m.Weight).where(m.Weight.time >= _ago(days)).order_by(m.Weight.time)
-        ).scalars()
+        s.execute(select(m.Weight).where(m.Weight.time >= _ago(days)).order_by(m.Weight.time)).scalars()
     )
 
 
 def latest_body_fat(s: Session) -> m.BodyFat | None:
-    return s.execute(
-        select(m.BodyFat).order_by(desc(m.BodyFat.time)).limit(1)
-    ).scalar_one_or_none()
+    return s.execute(select(m.BodyFat).order_by(desc(m.BodyFat.time)).limit(1)).scalar_one_or_none()
 
 
 def latest_height(s: Session) -> m.Height | None:
-    return s.execute(
-        select(m.Height).order_by(desc(m.Height.time)).limit(1)
-    ).scalar_one_or_none()
+    return s.execute(select(m.Height).order_by(desc(m.Height.time)).limit(1)).scalar_one_or_none()
 
 
 def recent_resting_hr(s: Session, days: int = 60) -> list[m.RestingHeartRate]:
@@ -201,28 +192,28 @@ def daily_nutrition(s: Session, days: int = 14) -> list[dict[str, Any]]:
 # printed on US "Nutrition Facts" labels. Keeps %DV familiar to anyone who reads food labels.
 # (label, sqlalchemy column, unit, daily_value)
 _MICROS: list[tuple[str, Any, str, float]] = [
-    ("Vitamin A",        m.Nutrition.vitamin_a_ug,   "µg",  900.0),
-    ("Vitamin C",        m.Nutrition.vitamin_c_mg,   "mg",   90.0),
-    ("Vitamin D",        m.Nutrition.vitamin_d_ug,   "µg",   20.0),
-    ("Vitamin E",        m.Nutrition.vitamin_e_mg,   "mg",   15.0),
-    ("Vitamin K",        m.Nutrition.vitamin_k_ug,   "µg",  120.0),
-    ("Vitamin B6",       m.Nutrition.vitamin_b6_mg,  "mg",    1.7),
-    ("Vitamin B12",      m.Nutrition.vitamin_b12_ug, "µg",    2.4),
-    ("Thiamin (B1)",     m.Nutrition.thiamin_mg,     "mg",    1.2),
-    ("Riboflavin (B2)",  m.Nutrition.riboflavin_mg,  "mg",    1.3),
-    ("Niacin (B3)",      m.Nutrition.niacin_mg,      "mg",   16.0),
-    ("Folate",           m.Nutrition.folate_ug,      "µg",  400.0),
+    ("Vitamin A", m.Nutrition.vitamin_a_ug, "µg", 900.0),
+    ("Vitamin C", m.Nutrition.vitamin_c_mg, "mg", 90.0),
+    ("Vitamin D", m.Nutrition.vitamin_d_ug, "µg", 20.0),
+    ("Vitamin E", m.Nutrition.vitamin_e_mg, "mg", 15.0),
+    ("Vitamin K", m.Nutrition.vitamin_k_ug, "µg", 120.0),
+    ("Vitamin B6", m.Nutrition.vitamin_b6_mg, "mg", 1.7),
+    ("Vitamin B12", m.Nutrition.vitamin_b12_ug, "µg", 2.4),
+    ("Thiamin (B1)", m.Nutrition.thiamin_mg, "mg", 1.2),
+    ("Riboflavin (B2)", m.Nutrition.riboflavin_mg, "mg", 1.3),
+    ("Niacin (B3)", m.Nutrition.niacin_mg, "mg", 16.0),
+    ("Folate", m.Nutrition.folate_ug, "µg", 400.0),
     ("Pantothenic acid", m.Nutrition.pantothenic_acid_mg, "mg", 5.0),
-    ("Calcium",          m.Nutrition.calcium_mg,     "mg", 1300.0),
-    ("Iron",             m.Nutrition.iron_mg,        "mg",   18.0),
-    ("Magnesium",        m.Nutrition.magnesium_mg,   "mg",  420.0),
-    ("Phosphorus",       m.Nutrition.phosphorus_mg,  "mg", 1250.0),
-    ("Zinc",             m.Nutrition.zinc_mg,        "mg",   11.0),
-    ("Copper",           m.Nutrition.copper_mg,      "mg",    0.9),
-    ("Manganese",        m.Nutrition.manganese_mg,   "mg",    2.3),
-    ("Selenium",         m.Nutrition.selenium_ug,    "µg",   55.0),
-    ("Sodium",           m.Nutrition.sodium_mg,      "mg", 2300.0),
-    ("Potassium",        m.Nutrition.potassium_mg,   "mg", 4700.0),
+    ("Calcium", m.Nutrition.calcium_mg, "mg", 1300.0),
+    ("Iron", m.Nutrition.iron_mg, "mg", 18.0),
+    ("Magnesium", m.Nutrition.magnesium_mg, "mg", 420.0),
+    ("Phosphorus", m.Nutrition.phosphorus_mg, "mg", 1250.0),
+    ("Zinc", m.Nutrition.zinc_mg, "mg", 11.0),
+    ("Copper", m.Nutrition.copper_mg, "mg", 0.9),
+    ("Manganese", m.Nutrition.manganese_mg, "mg", 2.3),
+    ("Selenium", m.Nutrition.selenium_ug, "µg", 55.0),
+    ("Sodium", m.Nutrition.sodium_mg, "mg", 2300.0),
+    ("Potassium", m.Nutrition.potassium_mg, "mg", 4700.0),
 ]
 
 
@@ -294,40 +285,38 @@ def top_meals(s: Session, days: int = 30, limit: int = 15) -> list[dict[str, Any
 
 
 def vitamins(s: Session) -> list[m.Vitamin]:
-    return list(
-        s.execute(select(m.Vitamin).order_by(m.Vitamin.sort_order, m.Vitamin.name)).scalars()
-    )
+    return list(s.execute(select(m.Vitamin).order_by(m.Vitamin.sort_order, m.Vitamin.name)).scalars())
 
 
 # FDA Daily Values + IOM Tolerable Upper Intake Levels for nutrients we tally on /supplements.
 # (display_name, unit, daily_value, upper_limit_or_None)
 _DV_INFO: dict[str, tuple[str, str, float, float | None]] = {
-    "vitamin_a_ug":         ("Vitamin A",        "µg",   900.0,  3000.0),
-    "vitamin_c_mg":         ("Vitamin C",        "mg",    90.0,  2000.0),
-    "vitamin_d_ug":         ("Vitamin D",        "µg",    20.0,   100.0),
-    "vitamin_e_mg":         ("Vitamin E",        "mg",    15.0,  1000.0),
-    "vitamin_k_ug":         ("Vitamin K",        "µg",   120.0,    None),
-    "vitamin_b6_mg":        ("Vitamin B6",       "mg",     1.7,   100.0),
-    "vitamin_b12_ug":       ("Vitamin B12",      "µg",     2.4,    None),
-    "thiamin_mg":           ("Thiamin (B1)",     "mg",     1.2,    None),
-    "riboflavin_mg":        ("Riboflavin (B2)",  "mg",     1.3,    None),
-    "niacin_mg":            ("Niacin (B3)",      "mg",    16.0,    35.0),
-    "folate_ug":            ("Folate",           "µg",   400.0,  1000.0),
-    "pantothenic_acid_mg":  ("Pantothenic acid", "mg",     5.0,    None),
-    "biotin_ug":            ("Biotin",           "µg",    30.0,    None),
-    "calcium_mg":           ("Calcium",          "mg",  1300.0,  2500.0),
-    "iron_mg":              ("Iron",             "mg",    18.0,    45.0),
-    "magnesium_mg":         ("Magnesium",        "mg",   420.0,   350.0),  # supplemental UL
-    "phosphorus_mg":        ("Phosphorus",       "mg",  1250.0,  4000.0),
-    "zinc_mg":              ("Zinc",             "mg",    11.0,    40.0),
-    "copper_mg":            ("Copper",           "mg",     0.9,    10.0),
-    "manganese_mg":         ("Manganese",        "mg",     2.3,    11.0),
-    "selenium_ug":          ("Selenium",         "µg",    55.0,   400.0),
-    "molybdenum_ug":        ("Molybdenum",       "µg",    45.0,  2000.0),
-    "iodine_ug":            ("Iodine",           "µg",   150.0,  1100.0),
-    "chromium_ug":          ("Chromium",         "µg",    35.0,    None),
-    "sodium_mg":            ("Sodium",           "mg",  2300.0,    None),
-    "potassium_mg":         ("Potassium",        "mg",  4700.0,    None),
+    "vitamin_a_ug": ("Vitamin A", "µg", 900.0, 3000.0),
+    "vitamin_c_mg": ("Vitamin C", "mg", 90.0, 2000.0),
+    "vitamin_d_ug": ("Vitamin D", "µg", 20.0, 100.0),
+    "vitamin_e_mg": ("Vitamin E", "mg", 15.0, 1000.0),
+    "vitamin_k_ug": ("Vitamin K", "µg", 120.0, None),
+    "vitamin_b6_mg": ("Vitamin B6", "mg", 1.7, 100.0),
+    "vitamin_b12_ug": ("Vitamin B12", "µg", 2.4, None),
+    "thiamin_mg": ("Thiamin (B1)", "mg", 1.2, None),
+    "riboflavin_mg": ("Riboflavin (B2)", "mg", 1.3, None),
+    "niacin_mg": ("Niacin (B3)", "mg", 16.0, 35.0),
+    "folate_ug": ("Folate", "µg", 400.0, 1000.0),
+    "pantothenic_acid_mg": ("Pantothenic acid", "mg", 5.0, None),
+    "biotin_ug": ("Biotin", "µg", 30.0, None),
+    "calcium_mg": ("Calcium", "mg", 1300.0, 2500.0),
+    "iron_mg": ("Iron", "mg", 18.0, 45.0),
+    "magnesium_mg": ("Magnesium", "mg", 420.0, 350.0),  # supplemental UL
+    "phosphorus_mg": ("Phosphorus", "mg", 1250.0, 4000.0),
+    "zinc_mg": ("Zinc", "mg", 11.0, 40.0),
+    "copper_mg": ("Copper", "mg", 0.9, 10.0),
+    "manganese_mg": ("Manganese", "mg", 2.3, 11.0),
+    "selenium_ug": ("Selenium", "µg", 55.0, 400.0),
+    "molybdenum_ug": ("Molybdenum", "µg", 45.0, 2000.0),
+    "iodine_ug": ("Iodine", "µg", 150.0, 1100.0),
+    "chromium_ug": ("Chromium", "µg", 35.0, None),
+    "sodium_mg": ("Sodium", "mg", 2300.0, None),
+    "potassium_mg": ("Potassium", "mg", 4700.0, None),
 }
 
 
@@ -487,9 +476,7 @@ def food_chart_data(daily: list[dict[str, Any]]) -> dict[str, list]:
     }
 
 
-def _avg_in_trailing_window(
-    s: Session, model: type, time_col, days: int
-) -> tuple[list, datetime | None]:
+def _avg_in_trailing_window(s: Session, model: type, time_col, days: int) -> tuple[list, datetime | None]:
     """Return (rows, anchor_end) for an N-day window ending at the most recent record.
 
     If there are no records, returns ([], None). Anchoring to the latest reading
@@ -501,9 +488,7 @@ def _avg_in_trailing_window(
         return [], None
     start = end - timedelta(days=days)
     rows = list(
-        s.execute(
-            select(model).where(time_col >= start, time_col <= end).order_by(time_col)
-        ).scalars()
+        s.execute(select(model).where(time_col >= start, time_col <= end).order_by(time_col)).scalars()
     )
     return rows, end
 
@@ -538,9 +523,7 @@ def landing_summary(s: Session) -> dict[str, Any]:
         else None
     )
 
-    rhr_rows, rhr_end = _avg_in_trailing_window(
-        s, m.RestingHeartRate, m.RestingHeartRate.time, days=30
-    )
+    rhr_rows, rhr_end = _avg_in_trailing_window(s, m.RestingHeartRate, m.RestingHeartRate.time, days=30)
     rhr_avg = (
         {
             "bpm": round(sum(r.bpm for r in rhr_rows) / len(rhr_rows)),

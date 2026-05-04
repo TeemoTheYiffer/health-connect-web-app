@@ -6,6 +6,7 @@ Two kinds of tables:
 
 Schema is identical across SQLite (dev) and Postgres (prod). Avoid Postgres-only types.
 """
+
 from __future__ import annotations
 
 from datetime import datetime
@@ -179,9 +180,7 @@ class SleepSession(_HCRecordMixin, Base):
 
 class SleepStage(Base):
     __tablename__ = "sleep_stage"
-    __table_args__ = (
-        UniqueConstraint("session_id", "start_time", name="uq_sleep_stage_session_start"),
-    )
+    __table_args__ = (UniqueConstraint("session_id", "start_time", name="uq_sleep_stage_session_start"),)
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     session_id: Mapped[int] = mapped_column(

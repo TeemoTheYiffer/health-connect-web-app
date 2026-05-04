@@ -1,4 +1,5 @@
 """FastAPI application factory and routes."""
+
 from __future__ import annotations
 
 import logging

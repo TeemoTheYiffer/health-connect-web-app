@@ -5,6 +5,7 @@ Usage:
     hcw-sync --local PATH      # read a local Health Connect SQLite (offline iteration)
     hcw-sync --init-db         # create tables and exit (dev/CI)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -23,7 +24,7 @@ def main(argv: list[str] | None = None) -> int:
         nargs="?",
         const=None,
         help="Read from a local Health Connect SQLite file instead of Drive. "
-             "If used without a value, falls back to LOCAL_HEALTH_CONNECT_DB env.",
+        "If used without a value, falls back to LOCAL_HEALTH_CONNECT_DB env.",
     )
     p.add_argument(
         "--init-db",
@@ -69,7 +70,9 @@ def main(argv: list[str] | None = None) -> int:
     run = runner.run_from_drive_export(export)
     log.info(
         "Drive sync done: file=%s status=%s rows=%d",
-        export.file_name, run.status, run.rows_upserted,
+        export.file_name,
+        run.status,
+        run.rows_upserted,
     )
     return 0 if run.status == "success" else 1
 

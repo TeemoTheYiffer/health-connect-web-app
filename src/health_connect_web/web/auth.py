@@ -8,6 +8,7 @@ Flow:
 - A FastAPI dependency `require_user` gates every page; otherwise redirects to /login,
   except for users with valid Google identity but disallowed email -> /forbidden.
 """
+
 from __future__ import annotations
 
 import logging

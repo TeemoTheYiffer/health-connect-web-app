@@ -1,4 +1,5 @@
 """Production entrypoint for the web app: `python -m health_connect_web.web` or `hcw-web`."""
+
 from __future__ import annotations
 
 import os

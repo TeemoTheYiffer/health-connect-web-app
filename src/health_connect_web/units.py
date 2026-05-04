@@ -6,6 +6,7 @@ Health Connect stores everything in SI / coarse units; UI shows human-friendly u
 - Height/distance: meters.
 - Energy: calories (not kcal).
 """
+
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta, timezone

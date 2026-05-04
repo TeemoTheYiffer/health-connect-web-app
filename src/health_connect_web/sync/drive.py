@@ -8,6 +8,7 @@ The phone uploads a zipped SQLite to a known Drive folder on a schedule. We:
 Authentication uses OAuth user creds (bootstrapped once via scripts/bootstrap_drive_oauth.py),
 mirroring the homebase-gcal pattern. The token JSON is read from the path in settings.
 """
+
 from __future__ import annotations
 
 import io

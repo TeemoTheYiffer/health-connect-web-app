@@ -3,6 +3,7 @@
 We intentionally don't ship a fixture export (PHI), so end-to-end coverage lives in the
 ad-hoc `hcw-sync --local` CLI run. These tests just guard against import-time regressions.
 """
+
 from __future__ import annotations
 
 
@@ -67,9 +68,24 @@ def test_models_create_in_memory_sqlite(monkeypatch, tmp_path) -> None:
 
     # Also assert Base has all expected tables.
     expected = {
-        "blood_pressure", "heart_rate", "heart_rate_sample", "resting_heart_rate", "steps",
-        "weight", "body_fat", "height", "active_calories", "total_calories", "distance",
-        "floors_climbed", "elevation_gained", "exercise_session", "sleep_session",
-        "sleep_stage", "nutrition", "vitamin", "sync_run",
+        "blood_pressure",
+        "heart_rate",
+        "heart_rate_sample",
+        "resting_heart_rate",
+        "steps",
+        "weight",
+        "body_fat",
+        "height",
+        "active_calories",
+        "total_calories",
+        "distance",
+        "floors_climbed",
+        "elevation_gained",
+        "exercise_session",
+        "sleep_session",
+        "sleep_stage",
+        "nutrition",
+        "vitamin",
+        "sync_run",
     }
     assert expected.issubset(set(Base.metadata.tables.keys()))

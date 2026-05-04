@@ -10,6 +10,7 @@ Then:
 Pops a browser, prompts for consent, writes `.secrets/drive_token.json`.
 That JSON is what gets injected into the Cloud Run Job in production.
 """
+
 from __future__ import annotations
 
 from pathlib import Path

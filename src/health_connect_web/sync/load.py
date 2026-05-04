@@ -3,6 +3,7 @@
 Idempotent: keyed by Health Connect's uuid. Re-running the sync against an unchanged
 export is a no-op (rows are updated to the same values).
 """
+
 from __future__ import annotations
 
 import logging
@@ -21,9 +22,7 @@ log = logging.getLogger(__name__)
 _IN_CHUNK = 500
 
 
-def _fetch_existing_by_uuid(
-    session: Session, model: type[m.Base], uuids: Iterable[str]
-) -> dict[str, Any]:
+def _fetch_existing_by_uuid(session: Session, model: type[m.Base], uuids: Iterable[str]) -> dict[str, Any]:
     uuids = list(uuids)
     out: dict[str, Any] = {}
     for i in range(0, len(uuids), _IN_CHUNK):
@@ -112,9 +111,7 @@ def _upsert_sleep_session(session: Session, rows: Iterable[dict[str, Any]]) -> i
             session.flush()
         for s in stages:
             obj.stages.append(
-                m.SleepStage(
-                    start_time=s["start_time"], end_time=s["end_time"], stage_type=s["stage_type"]
-                )
+                m.SleepStage(start_time=s["start_time"], end_time=s["end_time"], stage_type=s["stage_type"])
             )
         n += 1
     session.flush()

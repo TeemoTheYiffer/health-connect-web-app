@@ -2,6 +2,7 @@
 
 Run after editing the TOML to push changes into the DB. Idempotent on `slug`.
 """
+
 from __future__ import annotations
 
 import sys

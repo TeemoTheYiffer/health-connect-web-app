@@ -3,6 +3,7 @@
 Health Connect's tables share a common shape (uuid BLOB, start/end_time INT ms, app_info_id FK).
 We resolve the app FK to a package_name string and emit per-record-type dicts.
 """
+
 from __future__ import annotations
 
 import logging
@@ -99,10 +100,7 @@ def iter_heart_rate(con: sqlite3.Connection, apps: dict[int, str]) -> Iterator[d
             (r["row_id"],),
         ):
             sample_by_ts[s["epoch_millis"]] = s["beats_per_minute"]
-        samples = [
-            {"ts": ms_to_dt(ts), "bpm": bpm}
-            for ts, bpm in sorted(sample_by_ts.items())
-        ]
+        samples = [{"ts": ms_to_dt(ts), "bpm": bpm} for ts, bpm in sorted(sample_by_ts.items())]
         yield {
             **_common(r, apps),
             "start_time": ms_to_dt(r["start_time"], r["start_zone_offset"]),
@@ -127,8 +125,7 @@ def iter_steps(con: sqlite3.Connection, apps: dict[int, str]) -> Iterator[dict]:
 
 def iter_weight(con: sqlite3.Connection, apps: dict[int, str]) -> Iterator[dict]:
     for r in con.execute(
-        "SELECT uuid, last_modified_time, app_info_id, time, zone_offset, weight "
-        "FROM weight_record_table"
+        "SELECT uuid, last_modified_time, app_info_id, time, zone_offset, weight " "FROM weight_record_table"
     ):
         yield {
             **_common(r, apps),
@@ -151,8 +148,7 @@ def iter_body_fat(con: sqlite3.Connection, apps: dict[int, str]) -> Iterator[dic
 
 def iter_height(con: sqlite3.Connection, apps: dict[int, str]) -> Iterator[dict]:
     for r in con.execute(
-        "SELECT uuid, last_modified_time, app_info_id, time, zone_offset, height "
-        "FROM height_record_table"
+        "SELECT uuid, last_modified_time, app_info_id, time, zone_offset, height " "FROM height_record_table"
     ):
         yield {
             **_common(r, apps),
@@ -375,9 +371,15 @@ def _apply_cap(field: str, value: float | None) -> float | None:
 def iter_nutrition(con: sqlite3.Connection, apps: dict[int, str]) -> Iterator[dict]:
     hc_cols = [hc for hc, _ in NUTRITION_FIELDS.values()]
     cols = [
-        "uuid", "last_modified_time", "app_info_id",
-        "start_time", "start_zone_offset", "end_time", "end_zone_offset",
-        "meal_name", "meal_type",
+        "uuid",
+        "last_modified_time",
+        "app_info_id",
+        "start_time",
+        "start_zone_offset",
+        "end_time",
+        "end_zone_offset",
+        "meal_name",
+        "meal_type",
         *hc_cols,
     ]
     sql = f"SELECT {', '.join(cols)} FROM nutrition_record_table"

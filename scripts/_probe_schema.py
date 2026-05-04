@@ -1,4 +1,5 @@
 """One-shot: dump the schema and a row sample of the Health Connect export."""
+
 from __future__ import annotations
 
 import sqlite3
