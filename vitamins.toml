@@ -1,0 +1,348 @@
+# Joe's daily stack. Re-run `python scripts/seed_vitamins.py` after edits.
+# `positive_effects` = my reason for taking it. Hard facts only.
+# `side_effects` / `interactions` / `stack_interactions` = "None." when nothing applies.
+# `interactions` = drug-class / clinical facts. Personal routine details go in `stack_interactions`.
+# `contributes` = per-day amount used to compute the DV tally on /supplements.
+
+# ---------- Morning ----------
+
+[[items]]
+slug = "cardamom-pods"
+name = "Cardamom Pods"
+kind = "supplement"
+dose = "15 pods"
+frequency = "Daily, morning, brewed as tea"
+positive_effects = "Digestive support."
+side_effects = "None."
+interactions = "None."
+stack_interactions = "None."
+vendor = "Frontier Co-op"
+url = "https://www.amazon.com/dp/B001VNGPB8"
+sort_order = 10
+
+[[items]]
+slug = "zinc-picolinate"
+name = "Zinc Picolinate"
+kind = "supplement"
+dose = "30 mg"
+frequency = "Daily, morning"
+positive_effects = "Immune function, androgen receptor support."
+side_effects = "Nausea on empty stomach. Long-term high zinc depletes copper."
+interactions = "Reduces absorption of tetracyclines, fluoroquinolones, bisphosphonates (separate by 2 h). Competes with copper, calcium, iron at the gut."
+stack_interactions = "I take this 2 h before chlorophyll so the chlorophyll's copper doesn't bind it. With Prostate Essentials' 15 mg evening zinc my daily total is 45 mg; chlorophyll's 4 mg/day copper offsets the depletion risk."
+vendor = "Nutricost"
+url = "https://www.amazon.com/dp/B09JTXHKM1"
+sort_order = 20
+contributes = { zinc_mg = 30 }
+
+[[items]]
+slug = "triple-magnesium-complex"
+name = "Triple Magnesium Complex"
+kind = "supplement"
+dose = "Magnesium 300 mg (di-magnesium malate, bisglycinate, citrate)"
+frequency = "Daily, morning"
+positive_effects = "Muscle function, energy metabolism, GI motility, enzyme cofactor."
+side_effects = "Loose stools at higher doses (citrate)."
+interactions = "Reduces absorption of bisphosphonates, tetracyclines, fluoroquinolones (separate by 2 h)."
+stack_interactions = "Combined with my evening MagTech my elemental Mg is ~444 mg/day (~106% DV). I split AM/PM to reduce GI effects."
+vendor = "Nutricost"
+url = "https://www.amazon.com/dp/B0DJ1NFCS3"
+sort_order = 30
+contributes = { magnesium_mg = 300 }
+
+# ---------- Afternoon ----------
+
+[[items]]
+slug = "chlorophyll"
+name = "Sodium Copper Chlorophyllin (Chlorophyll)"
+kind = "supplement"
+dose = "100 mg/day (provides 4 mg copper, 5 mg sodium)"
+frequency = "Daily, afternoon"
+positive_effects = "Body and breath deodorizing."
+side_effects = "Green stool / urine (harmless)."
+interactions = "Copper competes with zinc at the gut."
+stack_interactions = "I take 2 h after zinc to avoid binding it. The 4 mg/day copper offsets depletion from my high daily zinc intake."
+vendor = "NOW Foods"
+url = "https://www.amazon.com/dp/B000MGWGOU"
+sort_order = 40
+contributes = { copper_mg = 4 }
+
+# ---------- Pre-workout (5x/week) ----------
+
+[[items]]
+slug = "stim-free-preworkout"
+name = "Stim-Free Pre-Workout"
+kind = "supplement"
+dose = "1 scoop (~20 g): Citrulline malate 8 g, Beta-alanine 4 g, Betaine 2.5 g, Taurine 1.3 g, L-Tyrosine 1 g, Alpha-GPC 300 mg, Senactiv 50 mg, BioPerine 5 mg"
+frequency = "30 min before workouts (5x/week)"
+positive_effects = "Pump, endurance, focus, recovery."
+side_effects = "Beta-alanine paresthesia (harmless tingling). Citrulline lowers BP slightly."
+interactions = "Avoid with nitrates."
+stack_interactions = "I time Tadalafil with this on workout days for additive vasodilation. I rise slowly to avoid lightheadedness."
+vendor = "Transparent Labs"
+url = "https://www.amazon.com/dp/B0CS3WZTJ2"
+sort_order = 50
+
+[[items]]
+slug = "creatine-monohydrate"
+name = "Creatine Monohydrate"
+kind = "supplement"
+dose = "5 g rest days, 10 g workout days"
+frequency = "Daily, with pre-workout on training days"
+positive_effects = "Strength, power, lean mass, cognitive support."
+side_effects = "Mild water retention early on."
+interactions = "Raises serum creatinine (a lab marker, not kidney damage). I flag this when getting kidney panels."
+stack_interactions = "None."
+vendor = "Nutricost"
+url = "https://www.amazon.com/dp/B01EVVQX9U"
+sort_order = 60
+
+[[items]]
+slug = "cordyceps"
+name = "Cordyceps"
+kind = "supplement"
+dose = "1000 mg"
+frequency = "Daily 8pm OR with pre-workout for synergy"
+positive_effects = "VO2max, energy, immune modulation."
+side_effects = "None."
+interactions = "Mild antiplatelet."
+stack_interactions = "None."
+vendor = "Real Mushrooms"
+url = "https://www.amazon.com/dp/B086LKQPFT"
+sort_order = 70
+
+# ---------- Evening (8pm, with break-fast) ----------
+
+[[items]]
+slug = "tribulus-terrestris"
+name = "Tribulus Terrestris (90% saponins)"
+kind = "supplement"
+dose = "650 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Libido support."
+side_effects = "None."
+interactions = "Mild blood-sugar lowering."
+stack_interactions = "None."
+vendor = "Evlution"
+url = "https://www.amazon.com/dp/B07MWDFRKF"
+sort_order = 100
+
+[[items]]
+slug = "fenugreek"
+name = "Fenugreek"
+kind = "supplement"
+dose = "1000 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Libido and free-testosterone support, glucose lowering."
+side_effects = "Maple-syrup body odor."
+interactions = "Mild antiplatelet."
+stack_interactions = "None."
+vendor = "NOW Foods"
+url = "https://www.amazon.com/dp/B00772D3C6"
+sort_order = 110
+
+[[items]]
+slug = "glucosamine-chondroitin"
+name = "Glucosamine & Chondroitin"
+kind = "supplement"
+dose = "Glucosamine 1500 mg + Chondroitin 1200 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Joint comfort and cartilage support."
+side_effects = "None."
+interactions = "Warfarin INR potentiation."
+stack_interactions = "None."
+vendor = "Kirkland"
+url = "https://www.amazon.com/dp/B00GYZWNY6"
+sort_order = 120
+
+[[items]]
+slug = "resveratrol"
+name = "Resveratrol Elite"
+kind = "supplement"
+dose = "Resveratrol Elite 222 mg (40 mg trans-resveratrol from Japanese knotweed) + Bio-Quercetin 9 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Antioxidant, sirtuin activation, cardiovascular support."
+side_effects = "None."
+interactions = "CYP3A4 / CYP2C9 inhibition. Mild antiplatelet."
+stack_interactions = "Could marginally raise Tadalafil levels via CYP3A4. Effect at this dose is small."
+vendor = "Life Extension"
+url = "https://www.amazon.com/dp/B07CVPPL64"
+sort_order = 130
+
+[[items]]
+slug = "molybdenum-chelated"
+name = "Molybdenum Chelated"
+kind = "supplement"
+dose = "250 mcg"
+frequency = "Daily, 8pm"
+positive_effects = "Sulfite oxidase cofactor; sulfite-sensitivity support."
+side_effects = "None."
+interactions = "None."
+stack_interactions = "None."
+vendor = "Kal"
+url = "https://www.amazon.com/dp/B00AAXG402"
+sort_order = 140
+contributes = { molybdenum_ug = 250 }
+
+[[items]]
+slug = "5-defenders-mushrooms"
+name = "5 Defenders (mushroom blend)"
+kind = "supplement"
+dose = "Turkey Tail 300 mg, Reishi 200 mg, Maitake 200 mg, Shiitake 200 mg, Chaga 100 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Immune modulation."
+side_effects = "None."
+interactions = "Reishi is mildly antiplatelet."
+stack_interactions = "None."
+vendor = "Real Mushrooms"
+url = "https://www.amazon.com/dp/B084JG2XWG"
+sort_order = 150
+
+[[items]]
+slug = "lions-mane"
+name = "Lion's Mane"
+kind = "supplement"
+dose = "1000 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Cognitive support, NGF / BDNF support, nerve regeneration."
+side_effects = "None."
+interactions = "Mild antiplatelet, mild blood-sugar lowering."
+stack_interactions = "None."
+vendor = "Real Mushrooms"
+url = "https://www.amazon.com/dp/B084JVN2VT"
+sort_order = 160
+
+[[items]]
+slug = "turmeric-boswellia"
+name = "Turmeric + Boswellia"
+kind = "supplement"
+dose = "Turmeric 1000 mg + Boswellia 1000 mg + BioPerine black pepper 1125 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Anti-inflammatory, joint comfort."
+side_effects = "None."
+interactions = "Piperine inhibits CYP3A4, CYP2D6, P-glycoprotein. Curcumin is mildly antiplatelet."
+stack_interactions = "Piperine could marginally raise Tadalafil levels. I flag any new prescription to a pharmacist."
+vendor = "Nutricost"
+url = "https://www.amazon.com/dp/B0FFCMHR2Q"
+sort_order = 170
+
+[[items]]
+slug = "omega-3-2x"
+name = "Ultimate Omega 2X"
+kind = "supplement"
+dose = "EPA 1125 mg + DHA 875 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Triglyceride lowering, anti-inflammatory, cognitive support."
+side_effects = "Fishy burps."
+interactions = "Mild antiplatelet. Synergistic BP-lowering with antihypertensives."
+stack_interactions = "None."
+vendor = "Nordic Naturals"
+url = "https://www.amazon.com/dp/B06XPPP4M2"
+sort_order = 180
+
+[[items]]
+slug = "magtech-magnesium"
+name = "MagTech Magnesium (evening)"
+kind = "supplement"
+dose = "Magnesium L-Threonate 1000 mg + Glycinate 690 mg + Taurate 630 mg (~144 mg elemental Mg)"
+frequency = "Daily, 8pm"
+positive_effects = "Sleep support, cognition (L-threonate crosses BBB), cardiovascular tone."
+side_effects = "Sedation (helpful at night)."
+interactions = "Same Mg-class interactions: separate antibiotics / bisphosphonates by 2 h."
+stack_interactions = "Combined with morning Triple Mg my daily elemental Mg is ~444 mg (~106% DV)."
+vendor = "Natural Stacks"
+url = "https://www.amazon.com/dp/B0B1N3H4ZD"
+sort_order = 190
+contributes = { magnesium_mg = 144 }
+
+[[items]]
+slug = "prostate-essentials-plus"
+name = "Prostate Essentials Plus"
+kind = "supplement"
+dose = "Per cap: Zinc 15 mg, Selenium 50 mcg, Stinging Nettles 120 mg, Saw Palmetto 90 mg, Asian Ginseng 50 mg, Pygeum 50 mg, Pumpkin Seed 40 mg, Glycine / Alanine / L-Glutamic Acid 25 mg ea, Beta-Sitosterol 20 mg, Lycopene 2.5 mg"
+frequency = "Daily, 8pm"
+positive_effects = "BPH / LUTS relief, DHT modulation."
+side_effects = "None."
+interactions = "Saw palmetto is mildly antiplatelet."
+stack_interactions = "Adds 15 mg zinc + 50 mcg selenium to my daily totals. Combined with AM zinc, daily zinc is 45 mg (UL is 40 mg; copper offsets it)."
+vendor = "Swanson"
+url = "https://www.amazon.com/dp/B01MTXUMN7"
+sort_order = 200
+contributes = { zinc_mg = 15, selenium_ug = 50 }
+
+[[items]]
+slug = "vitamin-d3-k2"
+name = "Mega D-3 & MK-7"
+kind = "supplement"
+dose = "Vitamin D3 125 mcg (5000 IU) + Vitamin K2 (MK-7) 180 mcg"
+frequency = "Daily, 8pm (with a fat-containing meal)"
+positive_effects = "Bone, immune, mood, cardiovascular support. K2 directs calcium to bone (not arteries)."
+side_effects = "Hypercalcemia at very high D3 long-term. I check 25(OH)D periodically."
+interactions = "K2 antagonizes warfarin. Caution with thiazide diuretics (raises calcium)."
+stack_interactions = "Magnesium aids vitamin D activation (I'm well covered)."
+vendor = "NOW"
+url = "https://www.amazon.com/dp/B09RG6LXJ2"
+sort_order = 210
+contributes = { vitamin_d_ug = 125, vitamin_k_ug = 180 }
+
+[[items]]
+slug = "digestive-enzymes"
+name = "Digestive Enzymes"
+kind = "supplement"
+dose = "ProHydrolase, Bromelain, Protease, Lipase 113 mg + immune blend 38 mg + carb / sugar enzymes 113 mg + fruit / veg fiber enzymes 23 mg + Lactase 3 mg"
+frequency = "Daily, 8pm"
+positive_effects = "Reduces post-meal bloating; lactose digestion."
+side_effects = "None."
+interactions = "Bromelain is mildly antiplatelet."
+stack_interactions = "None."
+vendor = "Sports Research"
+url = "https://www.amazon.com/dp/B08F8YC7C2"
+sort_order = 220
+
+# ---------- As-needed ----------
+
+[[items]]
+slug = "simethicone"
+name = "Simethicone"
+kind = "drug"
+dose = "125 mg"
+frequency = "As needed with sulfur or gassy vegetables (8pm)"
+positive_effects = "Reduces gas-related bloating."
+side_effects = "None."
+interactions = "None (not absorbed systemically)."
+stack_interactions = "None."
+vendor = "Amazon Basic Care"
+url = "https://www.amazon.com/dp/B096XX67P2"
+sort_order = 300
+
+[[items]]
+slug = "bean-zyme"
+name = "Bean-Zyme (Alpha-galactosidase)"
+kind = "supplement"
+dose = "400 GALU"
+frequency = "As needed with sulfur or gassy vegetables (8pm)"
+positive_effects = "Reduces fermentation gas from beans and cruciferous vegetables."
+side_effects = "None."
+interactions = "None."
+stack_interactions = "None."
+vendor = "Value Priced Meds"
+url = "https://www.amazon.com/dp/B000CQY9EK"
+sort_order = 310
+
+# ---------- Prescription ----------
+
+[[items]]
+slug = "tadalafil"
+name = "Tadalafil"
+kind = "drug"
+dose = "5 mg"
+frequency = "Daily, 8pm OR with pre-workout (peak ~2 h vs pre-workout's 1 h)"
+positive_effects = "PDE5 inhibition: ED treatment, BPH / LUTS relief."
+side_effects = "Headache, flushing, back / muscle pain, dyspepsia, nasal congestion. Rare: priapism (>4 h, ER), sudden hearing or vision changes."
+interactions = """ABSOLUTE: nitrates & riociguat. Both cause life-threatening hypotension.
+SIGNIFICANT: alpha-blockers (tamsulosin, doxazosin) → additive hypotension. Strong CYP3A4 inhibitors (clarithromycin, ketoconazole, ritonavir, grapefruit) raise levels. Strong CYP3A4 inducers (rifampin, St. John's wort) cut effectiveness. Antihypertensives → additive BP lowering."""
+stack_interactions = """Pre-workout's 8 g citrulline + 5 mg Tadalafil = additive vasodilation. I time them together intentionally on workout days and rise slowly to avoid lightheadedness.
+BioPerine (turmeric+boswellia) and resveratrol weakly inhibit CYP3A4; effect at my doses is small."""
+vendor = "Amazon Pharmacy"
+url = "https://pharmacy.amazon.com/dp/B0846RVWTF"
+sort_order = 400

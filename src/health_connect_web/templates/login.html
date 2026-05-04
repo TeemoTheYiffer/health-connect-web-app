@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Sign in | Health Portfolio{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1>Health Portfolio</h1>
+  <p class="muted">Sign in with the email Joe added to your invite.</p>
+  {% if error == 'oauth' %}
+    <p class="alert">Sign-in failed. Please try again.</p>
+  {% elif error == 'email' %}
+    <p class="alert">Your Google account is missing a verified email. Try a different account.</p>
+  {% endif %}
+  <a class="btn-google" href="/auth/google">
+    <span>Sign in with Google</span>
+  </a>
+</div>
+{% endblock %}

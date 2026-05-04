@@ -1,0 +1,303 @@
+:root {
+  --bg: #0f1419;
+  --surface: #1a1f26;
+  --border: #2a313a;
+  --text: #e6e8eb;
+  --muted: #8a93a0;
+  --accent: #4ea1ff;
+  --good: #5dd39e;
+  --warn: #f4b860;
+  --bad: #e07c7c;
+  --radius: 8px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.muted { color: var(--muted); font-size: 0.9em; }
+.alert { color: var(--bad); }
+
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 24px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.brand { font-weight: 700; color: var(--text); text-decoration: none; font-size: 17px; }
+.nav { display: flex; gap: 18px; flex: 1; }
+.nav a {
+  color: var(--muted);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+.nav a:hover, .nav a.active { color: var(--text); background: rgba(78, 161, 255, 0.12); }
+.user { display: flex; align-items: center; gap: 12px; }
+.user-name { color: var(--muted); font-size: 0.9em; }
+.logout { color: var(--accent); text-decoration: none; font-size: 0.9em; }
+
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.hero h1 { margin: 0 0 4px; }
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin: 24px 0;
+}
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.card h2 {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.big {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 6px 0 4px;
+}
+
+.chart-section { margin: 28px 0; }
+.chart-section h2 { margin: 0 0 12px; font-size: 18px; }
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+.section-header h2 { margin: 0; }
+.range-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.range-picker select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 13px;
+}
+
+/* Bounded box so Chart.js's responsive=true + maintainAspectRatio=false
+   has a finite parent height. Without this, the canvas grows on every resize. */
+.chart-wrap {
+  position: relative;
+  height: 260px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 12px;
+}
+.chart-wrap canvas { display: block; width: 100% !important; height: 100% !important; }
+
+.two-col {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 24px;
+  margin: 28px 0;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 14px;
+}
+.data-table.wide { font-size: 13px; }
+.data-table th, .data-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.data-table th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; }
+.data-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+/* Supplements/drugs table: prose-heavy cells. No fixed min-width so it fits the container;
+   `.table-scroll` still provides graceful overflow if a cell ever pushes past the container. */
+.vitamins-table { font-size: 13px; }
+.vitamins-table td { vertical-align: top; }
+.vitamins-table .cell-prose { white-space: pre-wrap; min-width: 180px; max-width: 280px; line-height: 1.5; }
+.vitamins-table tr.vit-drug td { background: rgba(224, 124, 124, 0.05); }
+
+/* Horizontal scroll wrapper so the wide table degrades gracefully on narrow viewports. */
+.table-scroll { overflow-x: auto; margin: 12px 0; }
+.table-scroll::-webkit-scrollbar { height: 8px; }
+.table-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.section-title { margin-top: 36px; }
+.dv-tally { margin: 24px 0 32px; }
+.dv-tally h2 { margin-bottom: 6px; }
+.dv-tally .small { font-size: 12px; }
+.dv-table { width: 100%; }
+.dv-table td, .dv-table th { white-space: nowrap; }
+.dv-table td:last-child, .dv-table th:last-child { white-space: normal; }
+.pct-bar.pct-bar-bad {
+  background: linear-gradient(
+    to right,
+    rgba(224, 124, 124, 0.4) 0,
+    rgba(224, 124, 124, 0.4) var(--pct),
+    transparent var(--pct)
+  );
+  border-color: var(--bad);
+  color: var(--bad);
+}
+.kind-tag {
+  display: inline-block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(78, 161, 255, 0.18);
+  color: var(--accent);
+  font-weight: 600;
+}
+.kind-tag.kind-drug { background: rgba(224, 124, 124, 0.18); color: var(--bad); }
+.kind-tag.kind-supplement { background: rgba(93, 211, 158, 0.18); color: var(--good); }
+.small-link { font-size: 11px; }
+
+.vitamins-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin: 16px 0 12px;
+}
+.filter-group { display: inline-flex; gap: 6px; }
+.filter-chip {
+  background: var(--surface);
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.filter-chip:hover { color: var(--text); border-color: var(--accent); }
+.filter-chip.active {
+  background: rgba(78, 161, 255, 0.18);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.filter-search {
+  flex: 1;
+  min-width: 220px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+.filter-search:focus { outline: none; border-color: var(--accent); }
+
+/* % DV badge: tinted background bar that fills proportional to intake (capped at 200%). */
+.pct-bar {
+  display: inline-block;
+  position: relative;
+  min-width: 80px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+  background: linear-gradient(
+    to right,
+    rgba(78, 161, 255, 0.25) 0,
+    rgba(78, 161, 255, 0.25) var(--pct),
+    transparent var(--pct)
+  );
+  border: 1px solid var(--border);
+}
+.pct-bar-low {
+  background: linear-gradient(
+    to right,
+    rgba(224, 124, 124, 0.25) 0,
+    rgba(224, 124, 124, 0.25) var(--pct),
+    transparent var(--pct)
+  );
+}
+.pct-bar-mid {
+  background: linear-gradient(
+    to right,
+    rgba(244, 184, 96, 0.25) 0,
+    rgba(244, 184, 96, 0.25) var(--pct),
+    transparent var(--pct)
+  );
+}
+.pct-bar-good {
+  background: linear-gradient(
+    to right,
+    rgba(93, 211, 158, 0.25) 0,
+    rgba(93, 211, 158, 0.25) var(--pct),
+    transparent var(--pct)
+  );
+}
+
+.cta { margin: 28px 0; }
+.btn-secondary {
+  display: inline-block;
+  padding: 8px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  text-decoration: none;
+  margin-right: 10px;
+  margin-bottom: 8px;
+}
+.btn-secondary:hover { border-color: var(--accent); }
+
+.auth-card {
+  max-width: 360px;
+  margin: 80px auto;
+  text-align: center;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 32px;
+}
+.btn-google {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: var(--accent);
+  color: #0f1419;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: var(--radius);
+}
+
+.footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85em;
+  margin: 48px auto 24px;
+}
+.footer p { margin: 4px 0; }

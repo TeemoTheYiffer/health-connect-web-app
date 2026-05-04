@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>{% block title %}Health Portfolio{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='style.css') }}">
+  <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('index') }}">Health Portfolio</a>
+    {% if user %}
+    <nav class="nav">
+      <a href="{{ url_for('index') }}" class="{% if request.url.path == '/' %}active{% endif %}">Overview</a>
+      <a href="{{ url_for('page_health') }}" class="{% if request.url.path == '/health' %}active{% endif %}">General Health</a>
+      <a href="{{ url_for('page_food') }}" class="{% if request.url.path == '/food' %}active{% endif %}">Food</a>
+      <a href="{{ url_for('page_supplements') }}" class="{% if request.url.path == '/supplements' %}active{% endif %}">Supplements</a>
+    </nav>
+    <div class="user">
+      <span class="user-name">{{ user.name }}</span>
+      <a href="{{ url_for('logout') }}" class="logout">Sign out</a>
+    </div>
+    {% endif %}
+  </header>
+
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>For personal reference, not medical advice.</p>
+    <p class="muted">v{{ app_version }}</p>
+  </footer>
+</body>
+</html>

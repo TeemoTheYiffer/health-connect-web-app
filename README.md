@@ -1,93 +1,195 @@
 # health-connect-web-app
 
+A personal **health portfolio** I can share with my doctors, friends, and family.
 
+Samsung Health Connect on my phone aggregates data from all my health apps (MacroFactor, Fitbod, Samsung Health, hospital FHIR, etc.) and exports a zipped SQLite snapshot to Google Drive on a schedule. This app:
 
-## Getting started
+1. Pulls the latest export from Drive (daily Cloud Run Job).
+2. Reads the SQLite, upserts into Cloud SQL Postgres.
+3. Serves a small FastAPI site with tabs for **Overview**, **General Health**, **Food**, and **Supplements & Drugs**, gated by Google OAuth + email allowlist.
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+> Sensitive data: every page is allowlisted. Sharing is invitation-only.
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## What's on each page
 
-## Add your files
+- **Overview**: 4 headline cards (BP 7d avg, Weight 7d avg, Resting HR 30d avg, Steps 30d avg, each anchored to the most recent reading) + a "Daily Micronutrients (food + supplements)" table that sums avg food intake against my supplement stack and compares both to FDA Daily Value and IOM Upper Limits.
+- **General Health**: latest readings, charts (BP, weight, steps, calories burned, RHR), recent workouts and sleep tables.
+- **Food**: macros chart with a 7/14/30/60/90/180-day window picker, daily-detail table, average daily micros vs % DV, top-logged items. All food windows anchor to my most recent food log so the page stays useful between syncs.
+- **Supplements & Drugs**: filterable table of my stack (search + supplement/drug chips) plus a Daily Value tally panel showing total daily intake from supplements vs DV and UL.
 
-* [Create](https://docs.gitlab.com/user/project/repository/web_editor/#create-a-file) or [upload](https://docs.gitlab.com/user/project/repository/web_editor/#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+## Architecture
 
+```text
+[ phone: Health Connect ] --(zip)--> [ Google Drive ]
+                                            |
+                       (cron: daily) [ Cloud Scheduler ]
+                                            |
+                                            v
+                            [ Cloud Run Job: hcw-sync ]
+                                            |
+                                            v
+                            [ Cloud SQL: Postgres 16 ]
+                                            ^
+                                            |
+                            [ Cloud Run Service: hcw-web ]
+                                            |
+                            (Google OAuth + email allowlist)
+                                            |
+                                            v
+                                       Joe + invitees
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/TeemoTheYiffer/health-connect-web-app.git
-git branch -M main
-git push -uf origin main
+
+Same container image runs both tiers; the Job overrides `command` to `hcw-sync`.
+
+## Local development
+
+### Prerequisites
+
+- Python 3.11+
+- A Google OAuth web client (Cloud Console > APIs & Services > Credentials, type "Web application")
+  with redirect URI `http://localhost:8000/auth/callback`.
+
+### Setup
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -e ".[dev]"
+copy .env.example .env  # fill in GOOGLE_OAUTH_CLIENT_ID / SECRET, ALLOWED_EMAILS
 ```
 
-## Integrate with your tools
+### Sync data into the local SQLite dev DB
 
-* [Set up project integrations](https://gitlab.com/TeemoTheYiffer/health-connect-web-app/-/settings/integrations)
+```powershell
+.\.venv\Scripts\python.exe -m health_connect_web.sync --local .\health_connect_export.db
+```
 
-## Collaborate with your team
+This creates `hcw.db` (the app's persistent store, not the Health Connect export) and upserts blood pressure, heart rate, steps, weight, body fat, height, calories, distance, floors, elevation, exercise sessions, sleep, and nutrition. A per-record sanity cap drops obvious upstream data-entry mistakes (e.g. thiamin entered as grams instead of milligrams).
 
-* [Invite team members and collaborators](https://docs.gitlab.com/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/user/project/merge_requests/creating_merge_requests/)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/user/project/issues/managing_issues/#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+### Seed supplements & drugs
 
-## Test and Deploy
+```powershell
+copy vitamins.toml.example vitamins.toml
+# edit vitamins.toml with the items I take (see comments in the file for field meanings)
+.\.venv\Scripts\python.exe scripts\seed_vitamins.py
+```
 
-Use the built-in continuous integration in GitLab.
+Each item's optional `contributes = { zinc_mg = 30 }` map drives the Daily Value tally on /supplements and the combined-intake table on the Overview page. Field keys match `_DV_INFO` in [`src/health_connect_web/web/queries.py`](src/health_connect_web/web/queries.py).
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/topics/autodevops/requirements/)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ci/environments/protected_environments/)
+### Run the web app
 
-***
+```powershell
+.\.venv\Scripts\python.exe -m uvicorn health_connect_web.web.app:app --host 127.0.0.1 --port 8000
+# Open http://localhost:8000
+```
 
-# Editing this README
+Templates and CSS hot-reload (Jinja's `auto_reload` + static-file revalidation), so editing a `.html` or `.css` file just needs a browser refresh. Python edits require a server restart.
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+### Run tests
 
-## Suggestions for a good README
+```powershell
+.\.venv\Scripts\python.exe -m pytest
+.\.venv\Scripts\python.exe -m ruff check .
+.\.venv\Scripts\python.exe -m black --check .
+```
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+### One-time Drive OAuth (for production sync)
 
-## Name
-Choose a self-explaining name for your project.
+Download an OAuth Desktop client JSON to `.secrets/drive_credentials.json`, then:
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+```powershell
+.\.venv\Scripts\python.exe scripts\bootstrap_drive_oauth.py
+```
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Writes `.secrets/drive_token.json`. That JSON gets uploaded to Secret Manager (`hcw-drive-token`) for the Cloud Run Job to use.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+## Deployment
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+GCP infrastructure is in [`infra/`](infra/) (Terraform, GCS-backed state). The pattern mirrors my [homebase-gcal-integration](../homebase-gcal-integration) project:
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+- Artifact Registry repo `containers` for images.
+- Cloud SQL Postgres (smallest enterprise tier) for persistence.
+- Cloud Run Service (`hcw-web`) for the FastAPI app, public + app-level allowlist.
+- Cloud Run Job (`hcw-sync`) invoked by Cloud Scheduler daily.
+- Secret Manager for session secret, DB password, OAuth client secret, Drive token JSON.
+- Workload Identity Federation pool for **GitLab CI** (no long-lived JSON keys).
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+CI is **not yet wired up**. Terraform creates the `gitlab-deployer` SA and OIDC pool so GitLab runs *can* deploy when the `.gitlab-ci.yml` is filled in.
+
+### One-time bootstrap
+
+```bash
+# Create the GCS state bucket (outside Terraform, chicken-and-egg).
+gcloud storage buckets create gs://health-connect-web-tfstate --location=us-west1
+
+cd infra
+terraform init
+terraform apply
+```
+
+After the first apply:
+
+```bash
+# Push the OAuth client secret as a new Secret Manager version.
+echo -n "<oauth-client-secret>" | gcloud secrets versions add hcw-google-oauth-client-secret --data-file=-
+
+# Push the Drive token JSON.
+gcloud secrets versions add hcw-drive-token --data-file=.secrets/drive_token.json
+
+# Build and push the first image, then update the Run service/job to point at it.
+gcloud auth configure-docker us-west1-docker.pkg.dev
+docker build -t us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1 .
+docker push us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1
+gcloud run services update hcw-web --region us-west1 --image us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1
+gcloud run jobs update hcw-sync --region us-west1 --image us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1
+
+# Trigger the first sync manually before relying on the daily cron.
+gcloud run jobs execute hcw-sync --region us-west1
+```
+
+### Required GitLab CI variables (when CI is wired up)
+
+| Name                         | Value                                                                  |
+| ---------------------------- | ---------------------------------------------------------------------- |
+| `GCP_PROJECT_ID`             | `health-connect-web`                                                   |
+| `GCP_WORKLOAD_IDENTITY_POOL` | `projects/<num>/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider` |
+| `GCP_DEPLOYER_SA`            | `gitlab-deployer@<project>.iam.gserviceaccount.com`                    |
+
+## Project layout
+
+```text
+src/health_connect_web/
+  config.py              # env-driven settings (pydantic)
+  db.py                  # SQLAlchemy engine/session
+  models.py              # all persistent tables (incl. JSON daily_contrib on Vitamin)
+  units.py               # ms-epoch -> datetime, g -> kg, etc.
+  sync/
+    drive.py             # pull latest export from Drive
+    extract.py           # open Health Connect SQLite, yield typed records
+                         # incl. NUTRITION_FIELDS unit conversion + sanity caps
+    load.py              # upsert into our DB (idempotent on uuid, chunked)
+    runner.py            # orchestrate
+    __main__.py          # `hcw-sync` CLI
+  web/
+    app.py               # FastAPI app factory + routes
+    auth.py              # Google OAuth + email allowlist
+    queries.py           # read queries; FDA DV / UL data lives here in _DV_INFO
+    __main__.py          # `hcw-web` uvicorn entrypoint
+  templates/             # Jinja: base, login, forbidden, index, health, food, supplements
+  static/                # style.css, charts.js (food chart), vitamins.js (supplements filter)
+scripts/
+  bootstrap_drive_oauth.py   # one-time: write Drive token to .secrets/
+  seed_vitamins.py           # idempotent: vitamins.toml -> Vitamin table
+infra/
+  main.tf, variables.tf, outputs.tf
+  artifact_registry.tf, cloud_sql.tf, secret_manager.tf
+  cloud_run_service.tf, cloud_run_job.tf, cloud_scheduler.tf
+  service_accounts.tf, gitlab_oidc.tf
+```
 
 ## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+- [ ] Wire up `.gitlab-ci.yml` (build + push, terraform plan/apply, deploy).
+- [ ] Alembic migrations (currently using `Base.metadata.create_all`).
+- [ ] Add a "Labs" tab that reads `medical_resource_table` (FHIR data from UCSD).
+- [ ] HTMX-driven date-range pickers on more charts (food's macros chart already has one).
+- [ ] Backup verification: weekly assertion that `hcw-sync` actually wrote rows.
