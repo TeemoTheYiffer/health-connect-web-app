@@ -1,0 +1,53 @@
+# Copy to vitamins.toml and edit. Run `python scripts/seed_vitamins.py` to load.
+#
+# Fields:
+#   slug                 unique upsert key. Stable across edits.
+#   name                 display name on /supplements.
+#   kind                 "supplement" or "drug" (filter chips on /supplements).
+#   dose                 free-form, e.g. "30 mg" or "1 scoop (~20 g): ...".
+#   frequency            free-form, e.g. "Daily, morning" or "30 min before workouts".
+#   started_on           optional ISO date.
+#   positive_effects     hard facts only. The reason I take it.
+#   side_effects         "None." if nothing applies. Skip "rare at this dose" filler.
+#   interactions         drug-class / clinical facts only. "None." if nothing applies.
+#   stack_interactions   how it interacts with my OTHER stack items + what I do.
+#                        Use "None." when nothing applies.
+#   vendor               manufacturer / brand.
+#   url                  link rendered as "[Link]" under the name.
+#   sort_order           lower numbers appear first.
+#   contributes          per-day amount used to compute the Daily Value tally on
+#                        /supplements + the combined intake panel on /. Keys must
+#                        match the field names in src/health_connect_web/web/queries.py
+#                        _DV_INFO (e.g. zinc_mg, vitamin_d_ug, magnesium_mg).
+#                        Omit for items with no DV-relevant nutrient content.
+
+[[items]]
+slug = "vitamin-d3-2000iu"
+name = "Vitamin D3"
+kind = "supplement"
+dose = "2000 IU (50 mcg)"
+frequency = "Daily, with breakfast"
+started_on = "2024-01-01"
+positive_effects = "Bone, immune, mood, cardiovascular support."
+side_effects = "Hypercalcemia at very high D3 long-term."
+interactions = "Caution with thiazide diuretics (raises calcium)."
+stack_interactions = "None."
+vendor = "(your brand)"
+url = "https://example.com/your-d3-product"
+sort_order = 10
+contributes = { vitamin_d_ug = 50 }
+
+[[items]]
+slug = "magnesium-glycinate-400mg"
+name = "Magnesium glycinate"
+kind = "supplement"
+dose = "400 mg"
+frequency = "Nightly"
+positive_effects = "Sleep support, muscle relaxation, enzyme cofactor."
+side_effects = "Loose stools at higher doses."
+interactions = "Reduces absorption of bisphosphonates and tetracyclines (separate by 2 h)."
+stack_interactions = "None."
+vendor = "(your brand)"
+url = ""
+sort_order = 20
+contributes = { magnesium_mg = 400 }

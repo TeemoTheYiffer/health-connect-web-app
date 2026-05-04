@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+build/
+dist/
+.eggs/
+
+# Virtualenvs
+.venv/
+venv/
+.python-version
+
+# Tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local env / secrets
+.env
+.env.*
+!.env.example
+.secrets/
+*.token.json
+credentials*.json
+
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfvars
+!infra/*.tfvars.example
+infra/.terraform.lock.hcl.bak
+
+# Local DB / large data
+*.sqlite
+*.sqlite3
+local.db
+hcw.db
+
+# Health Connect raw exports, never commit PHI
+health_connect_export.db
+health_connect_export.zip
+*.health_export.zip
+
+# Generated probe artifacts
+scripts/_schema_dump.txt
+scripts/_dumps/
+
+# Docker
+*.tar
+client_*
+settings.local.json

@@ -1,0 +1,119 @@
+{% extends "base.html" %}
+{% block title %}Supplements | Health Portfolio{% endblock %}
+{% block content %}
+<h1>Supplements &amp; Drugs</h1>
+
+{% if not items %}
+  <p class="muted">No items yet. Edit <code>vitamins.toml</code> and run
+    <code>python scripts/seed_vitamins.py</code>.</p>
+{% else %}
+
+{% if dv_tally %}
+<section class="dv-tally">
+  <h2>Daily Value Tally</h2>
+  <p class="muted small">Sum of nutrients I take across the stack vs FDA Daily Value (DV) and Tolerable Upper Intake Level (UL).</p>
+  <table class="data-table dv-table">
+    <thead>
+      <tr>
+        <th>Nutrient</th>
+        <th>My total</th>
+        <th>DV</th>
+        <th>% DV</th>
+        <th>UL</th>
+        <th>% UL</th>
+        <th>From</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in dv_tally %}
+        <tr>
+          <td><strong>{{ r.name }}</strong></td>
+          <td>{{ r.total }} {{ r.unit }}</td>
+          <td>{{ r.dv }} {{ r.unit }}</td>
+          <td>
+            <span class="pct-bar pct-bar-{% if r.pct_dv >= 100 %}good{% elif r.pct_dv >= 50 %}mid{% else %}low{% endif %}"
+                  style="--pct: {{ [r.pct_dv, 200] | min }}%;">
+              {{ r.pct_dv }}%
+            </span>
+          </td>
+          <td>{% if r.ul %}{{ r.ul }} {{ r.unit }}{% else %}<span class="muted small">n/a</span>{% endif %}</td>
+          <td>
+            {% if r.pct_ul is not none %}
+              <span class="pct-bar pct-bar-{% if r.pct_ul >= 100 %}bad{% elif r.pct_ul >= 75 %}mid{% else %}good{% endif %}"
+                    style="--pct: {{ [r.pct_ul, 150] | min }}%;">
+                {{ r.pct_ul }}%
+              </span>
+            {% else %}<span class="muted small">n/a</span>{% endif %}
+          </td>
+          <td class="muted small">
+            {% for src_name, src_amt in r.sources -%}
+              {{ src_amt }} ({{ src_name }}){% if not loop.last %} + {% endif %}
+            {%- endfor %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<h2 class="section-title">Stack ({{ items | length }} items)</h2>
+
+<div class="vitamins-filter">
+  <div class="filter-group" role="tablist" aria-label="Filter by kind">
+    <button type="button" class="filter-chip active" data-kind="all">All</button>
+    <button type="button" class="filter-chip" data-kind="supplement">Supplements</button>
+    <button type="button" class="filter-chip" data-kind="drug">Drugs</button>
+  </div>
+  <input
+    type="search"
+    id="vitSearch"
+    class="filter-search"
+    placeholder="Search name, vendor, or interaction..."
+    autocomplete="off"
+  >
+  <span class="muted small"><span id="vitCount">{{ items | length }}</span> shown</span>
+</div>
+
+<div class="table-scroll">
+<table class="data-table wide vitamins-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Dose</th>
+      <th>Frequency</th>
+      <th>Positive effects</th>
+      <th>Side effects</th>
+      <th>Interactions</th>
+      <th>Stack interactions</th>
+      <th>Vendor</th>
+    </tr>
+  </thead>
+  <tbody id="vitBody">
+    {% for v in items %}
+      <tr class="vit-{{ v.kind }}"
+          data-kind="{{ v.kind }}"
+          data-search="{{ ((v.name or '') ~ ' ' ~ (v.vendor or '') ~ ' ' ~ (v.interactions or '') ~ ' ' ~ (v.stack_interactions or '')) | lower }}">
+        <td>
+          <strong>{{ v.name }}</strong>
+          {% if v.url %}<br><a class="muted small-link" href="{{ v.url }}" target="_blank" rel="noopener">[Link]</a>{% endif %}
+        </td>
+        <td><span class="kind-tag kind-{{ v.kind }}">{{ v.kind }}</span></td>
+        <td>{{ v.dose or '' }}</td>
+        <td>{{ v.frequency or '' }}</td>
+        <td class="cell-prose">{{ v.positive_effects or '' }}</td>
+        <td class="cell-prose">{{ v.side_effects or '' }}</td>
+        <td class="cell-prose">{{ v.interactions or '' }}</td>
+        <td class="cell-prose">{{ v.stack_interactions or '' }}</td>
+        <td>{{ v.vendor or '' }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+<p id="vitEmpty" class="muted" hidden>No items match.</p>
+
+<script src="{{ url_for('static', path='vitamins.js') }}" defer></script>
+{% endif %}
+{% endblock %}

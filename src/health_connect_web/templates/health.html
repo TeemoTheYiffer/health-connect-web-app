@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block title %}General Health | Health Portfolio{% endblock %}
+{% block content %}
+<h1>General Health</h1>
+
+<section class="card-grid">
+  <article class="card">
+    <h2>Latest Blood Pressure</h2>
+    {% if bp_latest %}
+      <p class="big">{{ bp_latest.systolic | int }}/{{ bp_latest.diastolic | int }}</p>
+      <p class="muted">{{ bp_latest.time.strftime('%Y-%m-%d %H:%M') }}</p>
+    {% else %}<p class="muted">No readings.</p>{% endif %}
+  </article>
+  <article class="card">
+    <h2>Weight</h2>
+    {% if weight_latest %}
+      <p class="big">{{ '%.1f' % (weight_latest.weight_g / 1000) }} kg
+        <span class="muted">({{ '%.1f' % (weight_latest.weight_g / 1000 * 2.2046) }} lbs)</span></p>
+      <p class="muted">{{ weight_latest.time.strftime('%Y-%m-%d') }}</p>
+    {% else %}<p class="muted">No readings.</p>{% endif %}
+  </article>
+  <article class="card">
+    <h2>Body Fat</h2>
+    {% if body_fat %}
+      <p class="big">{{ '%.1f' % body_fat.percentage }}%</p>
+      <p class="muted">{{ body_fat.time.strftime('%Y-%m-%d') }}</p>
+    {% else %}<p class="muted">No readings.</p>{% endif %}
+  </article>
+  <article class="card">
+    <h2>Height</h2>
+    {% if height %}
+      <p class="big">{{ '%.0f' % (height.height_m * 100) }} cm
+        <span class="muted">({{ '%.2f' % height.height_m }} m)</span></p>
+    {% else %}<p class="muted">No readings.</p>{% endif %}
+  </article>
+</section>
+
+<section class="chart-section">
+  <h2>Blood Pressure (last 90 days)</h2>
+  {% if charts.bp.labels %}
+    <div class="chart-wrap"><canvas id="bpChart"></canvas></div>
+    <script id="bpData" type="application/json">{{ charts.bp | tojson }}</script>
+  {% else %}<p class="muted">No readings in the last 90 days.</p>{% endif %}
+</section>
+
+<section class="chart-section">
+  <h2>Weight (last 180 days)</h2>
+  {% if charts.weight.labels %}
+    <div class="chart-wrap"><canvas id="weightChart"></canvas></div>
+    <script id="weightData" type="application/json">{{ charts.weight | tojson }}</script>
+  {% else %}<p class="muted">No readings.</p>{% endif %}
+</section>
+
+<section class="chart-section">
+  <h2>Daily Steps (last 30 days)</h2>
+  {% if charts.steps.labels %}
+    <div class="chart-wrap"><canvas id="stepsChart"></canvas></div>
+    <script id="stepsData" type="application/json">{{ charts.steps | tojson }}</script>
+  {% else %}<p class="muted">No data.</p>{% endif %}
+</section>
+
+<section class="chart-section">
+  <h2>Calories Burned (last 30 days, kcal)</h2>
+  {% if charts.calories.labels %}
+    <div class="chart-wrap"><canvas id="caloriesChart"></canvas></div>
+    <script id="caloriesData" type="application/json">{{ charts.calories | tojson }}</script>
+  {% else %}<p class="muted">No data.</p>{% endif %}
+</section>
+
+<section class="chart-section">
+  <h2>Resting Heart Rate (last 60 days)</h2>
+  {% if charts.rhr.labels %}
+    <div class="chart-wrap"><canvas id="rhrChart"></canvas></div>
+    <script id="rhrData" type="application/json">{{ charts.rhr | tojson }}</script>
+  {% else %}<p class="muted">No data.</p>{% endif %}
+</section>
+
+<section class="two-col">
+  <div>
+    <h2>Recent Workouts</h2>
+    {% if exercise_recent %}
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Title</th><th>Duration</th></tr></thead>
+      <tbody>
+        {% for ex in exercise_recent %}
+          <tr>
+            <td>{{ ex.start_time.strftime('%Y-%m-%d') }}</td>
+            <td>{{ ex.title or 'Gym' }}</td>
+            <td>{{ '%.0f' % ((ex.end_time - ex.start_time).total_seconds() / 60) }} min</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="muted">No workouts logged.</p>{% endif %}
+  </div>
+  <div>
+    <h2>Recent Sleep</h2>
+    {% if sleep_recent %}
+    <table class="data-table">
+      <thead><tr><th>Date</th><th>Duration</th></tr></thead>
+      <tbody>
+        {% for s in sleep_recent %}
+          <tr>
+            <td>{{ s.start.strftime('%Y-%m-%d') }}</td>
+            <td>{{ '%.1f' % s.duration_h }} h</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}<p class="muted">No sleep sessions logged.</p>{% endif %}
+  </div>
+</section>
+
+<script src="{{ url_for('static', path='charts.js') }}" defer></script>
+{% endblock %}

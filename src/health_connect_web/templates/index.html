@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Overview | Health Portfolio{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Overview</h1>
+  {% if summary.last_sync %}
+    <p class="muted">Last sync: {{ summary.last_sync.started_at.strftime('%Y-%m-%d %H:%M UTC') }}
+      ({{ summary.last_sync.status }}, {{ summary.last_sync.rows_upserted }} rows)</p>
+  {% else %}
+    <p class="muted">No sync runs yet. Run <code>hcw-sync --local</code> to populate.</p>
+  {% endif %}
+</section>
+
+<section class="card-grid">
+  <article class="card">
+    <h2>Blood Pressure (7d avg)</h2>
+    {% if summary.bp_avg %}
+      <p class="big">{{ summary.bp_avg.systolic }}/{{ summary.bp_avg.diastolic }}</p>
+      <p class="muted">{{ summary.bp_avg.n }} reading{{ '' if summary.bp_avg.n == 1 else 's' }}, as of {{ summary.bp_avg.as_of.strftime('%Y-%m-%d') }}</p>
+    {% else %}<p class="muted">No readings yet.</p>{% endif %}
+  </article>
+  <article class="card">
+    <h2>Weight (7d avg)</h2>
+    {% if summary.weight_avg %}
+      <p class="big">{{ summary.weight_avg.kg }} kg</p>
+      <p class="muted">{{ summary.weight_avg.n }} reading{{ '' if summary.weight_avg.n == 1 else 's' }}, as of {{ summary.weight_avg.as_of.strftime('%Y-%m-%d') }}</p>
+    {% else %}<p class="muted">No readings yet.</p>{% endif %}
+  </article>
+  <article class="card">
+    <h2>Resting HR (30d avg)</h2>
+    {% if summary.rhr_avg %}
+      <p class="big">{{ summary.rhr_avg.bpm }} bpm</p>
+      <p class="muted">{{ summary.rhr_avg.n }} reading{{ '' if summary.rhr_avg.n == 1 else 's' }}, as of {{ summary.rhr_avg.as_of.strftime('%Y-%m-%d') }}</p>
+    {% else %}<p class="muted">No readings yet.</p>{% endif %}
+  </article>
+  <article class="card">
+    <h2>Steps (30d avg)</h2>
+    {% if summary.steps_avg %}
+      <p class="big">{{ '{:,}'.format(summary.steps_avg.count) }}</p>
+      <p class="muted">per day across {{ summary.steps_avg.n }} day{{ '' if summary.steps_avg.n == 1 else 's' }}, as of {{ summary.steps_avg.as_of.strftime('%Y-%m-%d') }}</p>
+    {% else %}<p class="muted">No readings yet.</p>{% endif %}
+  </article>
+</section>
+
+{% if combined_micros %}
+<section class="dv-tally">
+  <h2>Daily Micronutrients (food + supplements)</h2>
+  <p class="muted small">Food = avg over the last 7 days of logs. Supplements = daily intake. Sorted by % DV.</p>
+  <table class="data-table dv-table">
+    <thead>
+      <tr>
+        <th>Nutrient</th>
+        <th>Food</th>
+        <th>Supplements</th>
+        <th>Total</th>
+        <th>DV</th>
+        <th>% DV</th>
+        <th>UL</th>
+        <th>% UL</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in combined_micros %}
+        <tr>
+          <td><strong>{{ r.name }}</strong></td>
+          <td>{{ r.food }} {{ r.unit }}</td>
+          <td>
+            {% if r.supplements > 0 %}{{ r.supplements }} {{ r.unit }}{% else %}<span class="muted small">None</span>{% endif %}
+          </td>
+          <td><strong>{{ r.total }} {{ r.unit }}</strong></td>
+          <td>{{ r.dv }} {{ r.unit }}</td>
+          <td>
+            <span class="pct-bar pct-bar-{% if r.pct_dv >= 100 %}good{% elif r.pct_dv >= 50 %}mid{% else %}low{% endif %}"
+                  style="--pct: {{ [r.pct_dv, 200] | min }}%;">
+              {{ r.pct_dv }}%
+            </span>
+          </td>
+          <td>{% if r.ul %}{{ r.ul }} {{ r.unit }}{% else %}<span class="muted small">n/a</span>{% endif %}</td>
+          <td>
+            {% if r.pct_ul is not none %}
+              <span class="pct-bar pct-bar-{% if r.pct_ul >= 100 %}bad{% elif r.pct_ul >= 75 %}mid{% else %}good{% endif %}"
+                    style="--pct: {{ [r.pct_ul, 150] | min }}%;">
+                {{ r.pct_ul }}%
+              </span>
+            {% else %}<span class="muted small">n/a</span>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+<section class="cta">
+  <p>
+    <a class="btn-secondary" href="{{ url_for('page_health') }}">General Health →</a>
+    <a class="btn-secondary" href="{{ url_for('page_food') }}">Food →</a>
+    <a class="btn-secondary" href="{{ url_for('page_supplements') }}">Supplements →</a>
+  </p>
+</section>
+{% endblock %}
