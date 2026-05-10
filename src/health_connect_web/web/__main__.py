@@ -17,6 +17,11 @@ def main() -> int:
         port=port,
         reload=reload,
         log_level=os.environ.get("LOG_LEVEL", "info").lower(),
+        # Cloud Run terminates TLS at the front-end and forwards plain HTTP with
+        # X-Forwarded-Proto: https. Trust those headers so request.url_for() builds
+        # https URLs (otherwise the OAuth redirect URI comes out as http://).
+        proxy_headers=True,
+        forwarded_allow_ips="*",
     )
     return 0
 

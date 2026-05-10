@@ -50,6 +50,7 @@ resource "google_project_service" "services" {
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "compute.googleapis.com",
+    "drive.googleapis.com", # for the sync job's SA to read the Drive folder
   ])
   service            = each.key
   disable_on_destroy = false

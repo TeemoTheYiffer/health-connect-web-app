@@ -263,16 +263,19 @@ class Vitamin(Base):
     slug: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     name: Mapped[str] = mapped_column(String(255), nullable=False)
     kind: Mapped[str] = mapped_column(String(32), nullable=False)  # drug | vitamin | supplement
-    dose: Mapped[str | None] = mapped_column(String(128))
-    frequency: Mapped[str | None] = mapped_column(String(128))
+    # Dose and frequency descriptions can run long for supplement-stack products
+    # (e.g. Prostate Essentials' per-cap breakdown is ~220 chars). Text avoids
+    # arbitrary VARCHAR caps; Postgres treats VARCHAR vs TEXT identically anyway.
+    dose: Mapped[str | None] = mapped_column(Text)
+    frequency: Mapped[str | None] = mapped_column(Text)
     started_on: Mapped[str | None] = mapped_column(String(32))  # ISO date string
     positive_effects: Mapped[str | None] = mapped_column(Text)
     side_effects: Mapped[str | None] = mapped_column(Text)
     interactions: Mapped[str | None] = mapped_column(Text)
     stack_interactions: Mapped[str | None] = mapped_column(Text)
     notes: Mapped[str | None] = mapped_column(Text)
-    vendor: Mapped[str | None] = mapped_column(String(128))
-    url: Mapped[str | None] = mapped_column(String(512))
+    vendor: Mapped[str | None] = mapped_column(Text)
+    url: Mapped[str | None] = mapped_column(Text)
     # JSON map of {nutrient_field: amount_in_field_unit}, e.g. {"zinc_mg": 30}.
     # Summed across all items to drive the daily-value tally on /supplements.
     daily_contrib: Mapped[dict | None] = mapped_column(JSON)

@@ -5,8 +5,14 @@ The phone uploads a zipped SQLite to a known Drive folder on a schedule. We:
 2. Download it to a temp dir.
 3. Unzip the .db and return its path + the source file's metadata.
 
-Authentication uses OAuth user creds (bootstrapped once via scripts/bootstrap_drive_oauth.py),
-mirroring the homebase-gcal pattern. The token JSON is read from the path in settings.
+Authentication: prefers Application Default Credentials (ADC), which on Cloud Run
+returns the runtime service account. The Drive folder must be shared with that SA's
+email (Viewer role) for reads to work. Locally, ADC falls back to user creds from
+`gcloud auth application-default login` (request the drive scope at login time).
+
+For backward compatibility with the original OAuth-token flow, if a user-token JSON
+exists at the configured path we use that instead. This lets `bootstrap_drive_oauth.py`
+keep working for local dev when ADC isn't set up.
 """
 
 from __future__ import annotations
@@ -20,6 +26,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 
+import google.auth
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -40,18 +47,28 @@ class DriveExport:
     sqlite_path: Path  # Path to the unzipped .db, in a temp dir the caller should clean up.
 
 
-def _load_credentials() -> Credentials:
+def _load_credentials():
+    """Get credentials for Drive API.
+
+    Order of preference:
+    1. Local user-token JSON at `s.drive_token_json_path`, if it exists. Used by
+       devs who ran `scripts/bootstrap_drive_oauth.py`.
+    2. Application Default Credentials. On Cloud Run this returns the runtime
+       service account; locally it returns whatever `gcloud auth
+       application-default login` produced.
+    """
     s = get_settings()
     token_path = s.drive_token_json_path
-    if not token_path.exists():
-        raise RuntimeError(
-            f"Drive token not found at {token_path}. "
-            "Run `python scripts/bootstrap_drive_oauth.py` once to create it."
-        )
-    creds = Credentials.from_authorized_user_file(str(token_path), DRIVE_SCOPES)
-    if creds.expired and creds.refresh_token:
-        creds.refresh(Request())
-        token_path.write_text(creds.to_json(), encoding="utf-8")
+    if token_path.exists():
+        creds = Credentials.from_authorized_user_file(str(token_path), DRIVE_SCOPES)
+        if creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+            token_path.write_text(creds.to_json(), encoding="utf-8")
+        log.info("Drive auth: user OAuth token from %s", token_path)
+        return creds
+
+    creds, project = google.auth.default(scopes=DRIVE_SCOPES)
+    log.info("Drive auth: ADC (project=%s)", project)
     return creds
 
 

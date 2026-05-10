@@ -22,6 +22,11 @@ COPY src/ ./src/
 
 RUN pip install --no-cache-dir .
 
+# vitamins.toml is the source of truth for the supplement stack; the sync job
+# reads it on each run and upserts into the DB. Keeping it outside the package
+# so non-Python tooling (linters, GitLab UI) can read it directly from the repo.
+COPY vitamins.toml ./vitamins.toml
+
 # Drop privileges
 RUN useradd -u 1000 -m hcw && chown -R hcw:hcw /app
 USER hcw
