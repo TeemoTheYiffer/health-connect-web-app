@@ -251,6 +251,31 @@ class Nutrition(_HCRecordMixin, Base):
 # ---------- Curated content (managed by Joe, not synced) ----------
 
 
+class Herb(Base):
+    """A herbal/tea-blend ingredient I consume daily.
+
+    Tracked separately from Vitamin because teas are a different consumption
+    pattern (brewed daily, not capsuled) and the audience question is different:
+    doctors care about herbal pharmacology / drug interactions, not DV totals.
+    Curated by me via `teas.toml`, seeded by the sync job.
+    """
+
+    __tablename__ = "herb"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    slug: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    # Which brew the herb is in. "morning" | "nighttime" | "both".
+    blend: Mapped[str] = mapped_column(String(16), nullable=False)
+    amount: Mapped[str | None] = mapped_column(Text)
+    effects: Mapped[str | None] = mapped_column(Text)
+    drug_interactions: Mapped[str | None] = mapped_column(Text)
+    notes: Mapped[str | None] = mapped_column(Text)
+    vendor: Mapped[str | None] = mapped_column(Text)
+    url: Mapped[str | None] = mapped_column(Text)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
+
+
 class Vitamin(Base):
     """A drug, vitamin, or supplement Joe takes routinely.
 

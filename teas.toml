@@ -1,0 +1,127 @@
+# Joe's daily teas at the ingredient level. Doctors / nurses can use this to flag
+# herb-drug interactions before prescribing. Re-run via the hcw-sync job after edits.
+#
+# Fields:
+#   slug                 unique upsert key.
+#   name                 ingredient + Latin name for unambiguous identification.
+#   blend                "morning" | "nighttime" | "both".
+#   amount               typical daily quantity.
+#   effects              concise pharmacological action.
+#   drug_interactions    clinical interactions a prescriber would want to know.
+#   notes                personal-use notes (optional).
+#   vendor / url         where I source it.
+#   sort_order           lower numbers first.
+
+[[items]]
+slug = "decaf-black-tea"
+name = "Decaf black tea (Camellia sinensis, decaffeinated)"
+blend = "morning"
+amount = "3-4 sachets / day (Harney Vanilla Comoro, Hot Cinnamon Spice Decaf, Decaf Darjeeling)"
+effects = "Polyphenol antioxidants. Trace caffeine ~5-8 mg / cup."
+drug_interactions = "Tannins reduce non-heme iron and zinc absorption (separate by 1-2 h from mineral supplements). Mild antiplatelet at high intake."
+vendor = "Harney & Sons"
+url = "https://www.harney.com"
+sort_order = 10
+
+[[items]]
+slug = "fruit-tisane-blend"
+name = "Fruit tisane (apple / hibiscus / rose hip / various)"
+blend = "morning"
+amount = "3-4 sachets / day blended with the decaf blacks"
+effects = "Mild antioxidant. Hibiscus content adds mild BP-lowering (see Hibiscus entry)."
+drug_interactions = "See Hibiscus."
+notes = "Harney Fruit Tea Sampler: Peach, Mango, Goji Berry, Orange Passion Fruit, Strawberry Kiwi, Blood Orange. Also Tiesta Blueberry Wild Child."
+vendor = "Harney & Sons / Tiesta"
+url = ""
+sort_order = 20
+
+[[items]]
+slug = "cardamom"
+name = "Cardamom pods (Elettaria cardamomum)"
+blend = "both"
+amount = "2-3 lightly cracked pods in morning hot brew; 3-5 lightly crushed pods in nighttime brew"
+effects = "Digestive support, mild antimicrobial."
+drug_interactions = "Mild CYP3A4 inhibition at supratherapeutic doses (not at culinary). Mild blood-sugar lowering."
+notes = "Moved from /supplements; it's a brewed tea ingredient, not a capsuled supplement."
+vendor = "Frontier Co-op"
+url = "https://www.amazon.com/dp/B001VNGPB8"
+sort_order = 30
+
+[[items]]
+slug = "hibiscus"
+name = "Hibiscus flowers (Hibiscus sabdariffa)"
+blend = "both"
+amount = "Present in morning fruit blends + ~1 tbsp in nighttime brew"
+effects = "Mild systolic BP lowering (3-7 mmHg in trials), antioxidant, mild diuretic."
+drug_interactions = "Additive with antihypertensives. Lowers acetaminophen / paracetamol AUC. CYP2C9 / CYP3A4 modulation at high doses."
+notes = "Mildly beneficial for my elevated BP profile; not aggressive enough to require monitoring at culinary tea doses."
+vendor = ""
+url = ""
+sort_order = 40
+
+[[items]]
+slug = "chamomile"
+name = "Chamomile flowers (Matricaria recutita)"
+blend = "nighttime"
+amount = "~1 tbsp / nightly"
+effects = "GABAergic, anxiolytic, sleep support, anti-inflammatory."
+drug_interactions = "Mild CYP3A4 inhibition. Additive sedation with benzodiazepines / Z-drugs / opioids. Possible warfarin INR potentiation. Cross-reactivity with ragweed allergy."
+vendor = ""
+url = ""
+sort_order = 50
+
+[[items]]
+slug = "catnip"
+name = "Catnip (Nepeta cataria)"
+blend = "nighttime"
+amount = "~1 tbsp / nightly"
+effects = "Mild sedative, anxiolytic, GABAergic."
+drug_interactions = "Additive CNS depression with sedatives, alcohol, opioids."
+vendor = ""
+url = ""
+sort_order = 60
+
+[[items]]
+slug = "linden-flower"
+name = "Linden flower (Tilia spp.)"
+blend = "nighttime"
+amount = "~1 tbsp / nightly"
+effects = "Mild diuretic, mild sedative, anxiolytic."
+drug_interactions = "Additive with antihypertensives, diuretics. Mild antiplatelet at high doses."
+vendor = ""
+url = ""
+sort_order = 70
+
+[[items]]
+slug = "passion-flower"
+name = "Passion flower (Passiflora incarnata)"
+blend = "nighttime"
+amount = "~1 tsp / nightly"
+effects = "Anxiolytic, mild sedative, GABAergic."
+drug_interactions = "Additive sedation with benzodiazepines, alcohol. Possible MAOI interaction (avoid with SSRIs at high doses)."
+vendor = ""
+url = ""
+sort_order = 80
+
+[[items]]
+slug = "lemongrass"
+name = "Lemongrass (Cymbopogon citratus)"
+blend = "nighttime"
+amount = "~1 tsp / nightly"
+effects = "Mild GABAergic sleep support, mild diuretic, antimicrobial."
+drug_interactions = "Mild diuretic effect; additive with antihypertensives. CYP isoenzyme effects are minor at culinary doses."
+notes = "Added to the nighttime blend for mild GABAergic sleep support."
+vendor = "Frontier Co-Op"
+url = "https://www.amazon.com/dp/B0001M11L4"
+sort_order = 90
+
+[[items]]
+slug = "calendula"
+name = "Calendula flowers (Calendula officinalis)"
+blend = "nighttime"
+amount = "~1 tsp / nightly"
+effects = "Anti-inflammatory. Minimal systemic activity at culinary oral doses."
+drug_interactions = "None notable at this dose. Cross-reactivity with Asteraceae (ragweed, marigold) allergy."
+vendor = ""
+url = ""
+sort_order = 100

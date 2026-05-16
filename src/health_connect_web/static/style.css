@@ -181,7 +181,20 @@ body {
 }
 .kind-tag.kind-drug { background: rgba(224, 124, 124, 0.18); color: var(--bad); }
 .kind-tag.kind-supplement { background: rgba(93, 211, 158, 0.18); color: var(--good); }
+.kind-tag.kind-morning { background: rgba(244, 184, 96, 0.18); color: var(--warn); }
+.kind-tag.kind-nighttime { background: rgba(120, 130, 200, 0.22); color: #aeb8ff; }
+.kind-tag.kind-both { background: rgba(78, 161, 255, 0.18); color: var(--accent); }
 .small-link { font-size: 11px; }
+.small { font-size: 12px; }
+
+.schedule-section { margin: 32px 0; max-width: 1000px; }
+.schedule-section h2 { margin-bottom: 8px; }
+.schedule-section h3 { margin-top: 22px; font-size: 16px; color: var(--text); }
+.schedule-section p, .schedule-section li { line-height: 1.55; }
+.schedule-section ul, .schedule-section ol { padding-left: 20px; }
+.schedule-section ol.principles li { margin: 8px 0; }
+.schedule-table td:first-child { white-space: nowrap; min-width: 130px; vertical-align: top; }
+.schedule-table td { vertical-align: top; }
 
 .vitamins-filter {
   display: flex;

@@ -17,6 +17,8 @@
       <a href="{{ url_for('page_health') }}" class="{% if request.url.path == '/health' %}active{% endif %}">General Health</a>
       <a href="{{ url_for('page_food') }}" class="{% if request.url.path == '/food' %}active{% endif %}">Food</a>
       <a href="{{ url_for('page_supplements') }}" class="{% if request.url.path == '/supplements' %}active{% endif %}">Supplements</a>
+      <a href="{{ url_for('page_teas') }}" class="{% if request.url.path == '/teas' %}active{% endif %}">Teas</a>
+      <a href="{{ url_for('page_schedule') }}" class="{% if request.url.path == '/schedule' %}active{% endif %}">Schedule</a>
     </nav>
     <div class="user">
       <span class="user-name">{{ user.name }}</span>
@@ -30,7 +32,6 @@
   </main>
 
   <footer class="footer">
-    <p>For personal reference, not medical advice.</p>
     <p class="muted">v{{ app_version }}</p>
   </footer>
 </body>

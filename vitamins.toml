@@ -7,20 +7,6 @@
 # ---------- Morning ----------
 
 [[items]]
-slug = "cardamom-pods"
-name = "Cardamom Pods"
-kind = "supplement"
-dose = "15 pods"
-frequency = "Daily, morning, brewed as tea"
-positive_effects = "Digestive support."
-side_effects = "None."
-interactions = "None."
-stack_interactions = "None."
-vendor = "Frontier Co-op"
-url = "https://www.amazon.com/dp/B001VNGPB8"
-sort_order = 10
-
-[[items]]
 slug = "zinc-picolinate"
 name = "Zinc Picolinate"
 kind = "supplement"
@@ -34,6 +20,20 @@ vendor = "Nutricost"
 url = "https://www.amazon.com/dp/B09JTXHKM1"
 sort_order = 20
 contributes = { zinc_mg = 30 }
+
+[[items]]
+slug = "korean-panax-ginseng"
+name = "Korean Panax Ginseng"
+kind = "supplement"
+dose = "2 caps = 1000 mg extract (100 mg ginsenosides)"
+frequency = "Daily, morning, with coffee"
+positive_effects = "Cognitive support, energy, libido."
+side_effects = "Insomnia, jitters if taken late."
+interactions = "Mild antiplatelet. Possible warfarin INR interaction. Additive stimulant effect with caffeine."
+stack_interactions = "I time with morning coffee for cognitive synergy. Clears well before 2am bedtime given ~5-7 h half-life."
+vendor = ""
+url = ""
+sort_order = 25
 
 [[items]]
 slug = "triple-magnesium-complex"
@@ -51,6 +51,21 @@ sort_order = 30
 contributes = { magnesium_mg = 300 }
 
 # ---------- Afternoon ----------
+
+[[items]]
+slug = "psyllium-husk"
+name = "Psyllium Husk"
+kind = "supplement"
+dose = "9 g (~70% soluble, ~30% insoluble fiber)"
+frequency = "Daily, 2pm with water"
+positive_effects = "Soluble fiber, regularity, LDL cholesterol lowering."
+side_effects = "Bloating or gas if hydration is inadequate."
+interactions = "Slows absorption of many oral medications (lithium, levothyroxine, metformin, statins, warfarin); separate by 2 h."
+stack_interactions = "2pm timing buffers it from morning minerals (~3 h after) and the OMAD bolus (~6 h before)."
+vendor = ""
+url = ""
+sort_order = 35
+contributes = { dietary_fiber_g = 9 }
 
 [[items]]
 slug = "chlorophyll"
@@ -225,6 +240,21 @@ stack_interactions = "Piperine could marginally raise Tadalafil levels. I flag a
 vendor = "Nutricost"
 url = "https://www.amazon.com/dp/B0FFCMHR2Q"
 sort_order = 170
+
+[[items]]
+slug = "vitamin-e"
+name = "Vitamin E"
+kind = "supplement"
+dose = "180 mg (400 IU) d-alpha-tocopherol"
+frequency = "Daily, 8pm OR with pre-workout (peak ~2 h vs pre-workout's 1 h)"
+positive_effects = "Antioxidant, immune support."
+side_effects = "None."
+interactions = "Antiplatelet at high doses."
+stack_interactions = "Adds to the stack-wide antiplatelet load (omega-3, turmeric, cordyceps, etc.). I pause the stack ~1 week before any surgery or dental work."
+vendor = "Nature Made"
+url = "https://www.amazon.com/dp/B00008I8NN"
+sort_order = 175
+contributes = { vitamin_e_mg = 180 }
 
 [[items]]
 slug = "omega-3-2x"

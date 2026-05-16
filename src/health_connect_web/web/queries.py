@@ -288,6 +288,42 @@ def vitamins(s: Session) -> list[m.Vitamin]:
     return list(s.execute(select(m.Vitamin).order_by(m.Vitamin.sort_order, m.Vitamin.name)).scalars())
 
 
+def herbs(s: Session) -> list[m.Herb]:
+    return list(s.execute(select(m.Herb).order_by(m.Herb.sort_order, m.Herb.name)).scalars())
+
+
+# (label, model, primary timestamp column) per Health-Connect-sourced table we surface.
+_FRESHNESS_SOURCES: list[tuple[str, Any, Any]] = [
+    ("Blood pressure", m.BloodPressure, m.BloodPressure.time),
+    ("Weight", m.Weight, m.Weight.time),
+    ("Body fat", m.BodyFat, m.BodyFat.time),
+    ("Resting HR", m.RestingHeartRate, m.RestingHeartRate.time),
+    ("Heart rate", m.HeartRate, m.HeartRate.start_time),
+    ("Steps", m.Steps, m.Steps.start_time),
+    ("Active calories", m.ActiveCalories, m.ActiveCalories.start_time),
+    ("Total calories", m.TotalCalories, m.TotalCalories.start_time),
+    ("Distance", m.Distance, m.Distance.start_time),
+    ("Exercise session", m.ExerciseSession, m.ExerciseSession.start_time),
+    ("Sleep session", m.SleepSession, m.SleepSession.start_time),
+    ("Nutrition", m.Nutrition, m.Nutrition.start_time),
+]
+
+
+def data_freshness(s: Session) -> list[dict[str, Any]]:
+    """Latest record timestamp + row count per Health-Connect-sourced table.
+
+    Used on Overview to diagnose 'sync ran but data didn't advance' situations.
+    A table whose latest row lags far behind the others points at the upstream
+    integration (e.g. MacroFactor -> Health Connect) being the broken link.
+    """
+    out: list[dict[str, Any]] = []
+    for label, _model, time_col in _FRESHNESS_SOURCES:
+        row = s.execute(select(func.count(), func.max(time_col))).one()
+        count, latest = row[0], row[1]
+        out.append({"label": label, "count": count, "latest": latest})
+    return out
+
+
 # FDA Daily Values + IOM Tolerable Upper Intake Levels for nutrients we tally on /supplements.
 # (display_name, unit, daily_value, upper_limit_or_None)
 _DV_INFO: dict[str, tuple[str, str, float, float | None]] = {
@@ -303,6 +339,7 @@ _DV_INFO: dict[str, tuple[str, str, float, float | None]] = {
     "niacin_mg": ("Niacin (B3)", "mg", 16.0, 35.0),
     "folate_ug": ("Folate", "µg", 400.0, 1000.0),
     "pantothenic_acid_mg": ("Pantothenic acid", "mg", 5.0, None),
+    "dietary_fiber_g": ("Fiber", "g", 28.0, None),
     "biotin_ug": ("Biotin", "µg", 30.0, None),
     "calcium_mg": ("Calcium", "mg", 1300.0, 2500.0),
     "iron_mg": ("Iron", "mg", 18.0, 45.0),
