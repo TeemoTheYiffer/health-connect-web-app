@@ -12,7 +12,9 @@ resource "random_password" "session_secret" {
 
 resource "google_secret_manager_secret" "session_secret" {
   secret_id = "hcw-session-secret"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
   depends_on = [google_project_service.services]
 }
 
@@ -25,7 +27,9 @@ resource "google_secret_manager_secret_version" "session_secret" {
 
 resource "google_secret_manager_secret" "db_password" {
   secret_id  = "hcw-db-password"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
   depends_on = [google_project_service.services]
 }
 
@@ -38,7 +42,9 @@ resource "google_secret_manager_secret_version" "db_password" {
 
 resource "google_secret_manager_secret" "google_oauth_client_secret" {
   secret_id  = "hcw-google-oauth-client-secret"
-  replication { auto {} }
+  replication {
+    auto {}
+  }
   depends_on = [google_project_service.services]
 
   lifecycle {
@@ -46,15 +52,13 @@ resource "google_secret_manager_secret" "google_oauth_client_secret" {
   }
 }
 
-# --- Drive OAuth token JSON (managed out-of-band by the deploy pipeline) ---
-
-resource "google_secret_manager_secret" "drive_token" {
-  secret_id  = "hcw-drive-token"
-  replication { auto {} }
-  depends_on = [google_project_service.services]
-}
-
 # --- IAM: which SAs can read which secrets ---
+#
+# Drive auth previously used an OAuth user-token stored here as `hcw-drive-token`.
+# That secret was retired when we switched the sync job to use ADC + a service-account
+# share on the Drive folder (no token = no 7-day refresh-token expiry). The runtime
+# SA `hcw-sync-runner` reads Drive via its share permissions; nothing in Secret Manager
+# is needed for Drive anymore.
 
 # Web service: session secret, DB password, OAuth client secret.
 locals {
@@ -64,8 +68,7 @@ locals {
     google_oauth_client_secret = google_secret_manager_secret.google_oauth_client_secret.id
   }
   sync_secrets = {
-    db_password  = google_secret_manager_secret.db_password.id
-    drive_token  = google_secret_manager_secret.drive_token.id
+    db_password = google_secret_manager_secret.db_password.id
   }
 }
 
@@ -90,8 +93,3 @@ resource "google_secret_manager_secret_iam_member" "deployer_oauth_client_writer
   member    = "serviceAccount:${google_service_account.deployer.email}"
 }
 
-resource "google_secret_manager_secret_iam_member" "deployer_drive_token_writer" {
-  secret_id = google_secret_manager_secret.drive_token.id
-  role      = "roles/secretmanager.secretVersionAdder"
-  member    = "serviceAccount:${google_service_account.deployer.email}"
-}

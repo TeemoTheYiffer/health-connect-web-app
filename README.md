@@ -137,10 +137,10 @@ gcloud secrets versions add hcw-drive-token --data-file=.secrets/drive_token.jso
 
 # Build and push the first image, then update the Run service/job to point at it.
 gcloud auth configure-docker us-west1-docker.pkg.dev
-docker build -t us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1 .
-docker push us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1
-gcloud run services update hcw-web --region us-west1 --image us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1
-gcloud run jobs update hcw-sync --region us-west1 --image us-west1-docker.pkg.dev/health-connect-web/containers/hcw-web:v1
+docker build -t us-west1-docker.pkg.dev/health-connect-web-app/containers/hcw-web:v1 .
+docker push us-west1-docker.pkg.dev/health-connect-web-app/containers/hcw-web:v1
+gcloud run services update hcw-web --region us-west1 --image us-west1-docker.pkg.dev/health-connect-web-app/containers/hcw-web:v1
+gcloud run jobs update hcw-sync --region us-west1 --image us-west1-docker.pkg.dev/health-connect-web-app/containers/hcw-web:v1
 
 # Trigger the first sync manually before relying on the daily cron.
 gcloud run jobs execute hcw-sync --region us-west1
@@ -150,7 +150,7 @@ gcloud run jobs execute hcw-sync --region us-west1
 
 | Name                         | Value                                                                  |
 | ---------------------------- | ---------------------------------------------------------------------- |
-| `GCP_PROJECT_ID`             | `health-connect-web`                                                   |
+| `GCP_PROJECT_ID`             | `health-connect-web-app`                                               |
 | `GCP_WORKLOAD_IDENTITY_POOL` | `projects/<num>/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider` |
 | `GCP_DEPLOYER_SA`            | `gitlab-deployer@<project>.iam.gserviceaccount.com`                    |
 

@@ -28,5 +28,6 @@ local.db
 hcw.db
 health_connect_export.db
 health_connect_export.zip
-README.md
+# NB: don't exclude README.md, pyproject.toml references it via `readme = "README.md"`
+# and pip will fail to build the package without it.
 HANDOFF.md

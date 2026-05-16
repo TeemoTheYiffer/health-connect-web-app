@@ -1,7 +1,7 @@
 variable "project_id" {
   description = "GCP project ID hosting the app."
   type        = string
-  default     = "health-connect-web"
+  default     = "health-connect-web-app"
 }
 
 variable "region" {
@@ -43,24 +43,23 @@ variable "gitlab_project_path" {
 variable "owner_email" {
   description = "Email of the site owner, implicitly always allowed and has admin rights."
   type        = string
-  default     = "joeaguirre0@yahoo.com"
+  default     = "joeaguirre0@gmail.com"
 }
 
 variable "allowed_emails" {
   description = "Additional emails allowed to view the site (Google OAuth allowlist). Owner is implicit."
   type        = list(string)
-  default     = []
+  default     = ["joeaguirre0@yahoo.com", "joeaguirre@khatnid.com", "catnip447@gmail.com", "zoepepe02@gmail.com"]
 }
 
 variable "drive_folder_id" {
   description = "Google Drive folder ID containing Health Connect export zips."
   type        = string
-  default     = ""
+  default     = "1xsLGjjeZEFI7CtAl2rjrv-ul2oC05XmM"
 }
 
 variable "google_oauth_client_id" {
-  description = "OAuth client ID for the web app's Google sign-in. Set via TF_VAR_google_oauth_client_id; never commit."
+  description = "OAuth client ID for the web app's Google sign-in. Public value (not a secret) so it lives in source."
   type        = string
-  default     = ""
-  sensitive   = true
+  default     = "1093810433932-8hbn9b035vcrtledn21bcg7jffapl5rj.apps.googleusercontent.com"
 }
