@@ -77,10 +77,7 @@ build:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   script:
-    - gcloud builds submit
-        --tag $IMAGE:$CI_COMMIT_SHORT_SHA
-        --tag $IMAGE:latest
-        .
+    - gcloud builds submit --tag "$IMAGE:$CI_COMMIT_SHORT_SHA" --tag "$IMAGE:latest" .
 
 # ---------- deploy: roll new image to Cloud Run service + job ----------
 
@@ -91,16 +88,10 @@ deploy:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   script:
-    - gcloud run services update hcw-web
-        --region $GCP_REGION
-        --image $IMAGE:$CI_COMMIT_SHORT_SHA
-        --quiet
-    - gcloud run jobs update hcw-sync
-        --region $GCP_REGION
-        --image $IMAGE:$CI_COMMIT_SHORT_SHA
-        --quiet
+    - gcloud run services update hcw-web --region "$GCP_REGION" --image "$IMAGE:$CI_COMMIT_SHORT_SHA" --quiet
+    - gcloud run jobs update hcw-sync --region "$GCP_REGION" --image "$IMAGE:$CI_COMMIT_SHORT_SHA" --quiet
     - echo "Deployed $CI_COMMIT_SHORT_SHA"
-    - echo "Web: https://hcw-web-1093810433932.us-west1.run.app"
+    - 'echo "Web: https://hcw-web-1093810433932.us-west1.run.app"'
 
 # NOTE: terraform apply is intentionally not in CI. It requires broad IAM
 # (Cloud SQL admin, Secret Manager admin, IAM admin, etc.) and can destroy
