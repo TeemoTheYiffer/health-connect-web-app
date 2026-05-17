@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+{% block title %}Supplement Schedule | Health Portfolio{% endblock %}
+{% block content %}
+<h1>Supplement Schedule</h1>
+
+{% if not data %}
+  <p class="muted">
+    No <code>schedule.toml</code> found. Add one to the repo root (or container's <code>/app</code>) to populate this page.
+  </p>
+{% else %}
+
+{% if data.meta %}
+<p class="muted">
+  {% if data.meta.last_updated %}Last updated: {{ data.meta.last_updated }}.{% endif %}
+  {% if data.meta.context %} Context: {{ data.meta.context }}{% endif %}
+  {% if data.meta.chronotype %} Chronotype: {{ data.meta.chronotype }}.{% endif %}
+</p>
+{% endif %}
+
+{% if data.core_principles %}
+<section class="schedule-section">
+  <h2>Core Design Principles</h2>
+  <ol class="principles">
+    {% for p in data.core_principles %}
+      <li><strong>{{ p.title }}.</strong> {{ p.body }}</li>
+    {% endfor %}
+  </ol>
+</section>
+{% endif %}
+
+{% if data.training_day and data.training_day.slots %}
+<section class="schedule-section">
+  <h2>Training Days</h2>
+  {% if data.training_day.intro %}<p class="muted">{{ data.training_day.intro }}</p>{% endif %}
+  <table class="data-table schedule-table">
+    <thead><tr><th>Time</th><th>Items</th><th>Purpose / notes</th></tr></thead>
+    <tbody>
+      {% for slot in data.training_day.slots %}
+        <tr>
+          <td><strong>{{ slot.time }}</strong></td>
+          {% if slot.purpose %}
+            <td>{{ slot.items }}</td>
+            <td>{{ slot.purpose }}</td>
+          {% else %}
+            <td colspan="2"><strong>{{ slot.items }}</strong></td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+{% if data.rest_day %}
+<section class="schedule-section">
+  <h2>Rest Days</h2>
+  {% if data.rest_day.intro %}<p class="muted">{{ data.rest_day.intro }}</p>{% endif %}
+  {% if data.rest_day.intro_2 %}<p>{{ data.rest_day.intro_2 }}</p>{% endif %}
+  {% if data.rest_day.changes %}
+    <ul>
+      {% for c in data.rest_day.changes %}<li>{{ c }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+  {% if data.rest_day.rationale %}<p class="muted small">{{ data.rest_day.rationale }}</p>{% endif %}
+</section>
+{% endif %}
+
+{% if data.caffeine %}
+<section class="schedule-section">
+  <h2>Caffeine Rules</h2>
+  {% if data.caffeine.intro %}<p><strong>{{ data.caffeine.intro }}</strong></p>{% endif %}
+  {% if data.caffeine.reasoning %}
+    <ul>
+      {% for r in data.caffeine.reasoning %}<li>{{ r }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+  {% if data.caffeine.ceiling %}<p>{{ data.caffeine.ceiling }}</p>{% endif %}
+
+  {% if data.caffeine.options_table %}
+    <h3>4pm options</h3>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th></th>
+          {% for col in data.caffeine.options_table.columns %}<th>{{ col }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data.caffeine.options_table.rows %}
+          <tr>
+            <td>{{ row.label }}</td>
+            {% for v in row.values %}<td>{{ v }}</td>{% endfor %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+
+  {% if data.caffeine.note %}<p class="muted small">{{ data.caffeine.note }}</p>{% endif %}
+</section>
+{% endif %}
+
+{% if data.pairings %}
+<section class="schedule-section">
+  <h2>Key Pairings &amp; Rationale</h2>
+  {% for p in data.pairings %}
+    <h3>{{ p.title }}</h3>
+    <p>{{ p.body }}</p>
+  {% endfor %}
+</section>
+{% endif %}
+
+{% endif %}
+{% endblock %}

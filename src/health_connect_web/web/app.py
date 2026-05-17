@@ -18,7 +18,7 @@ from health_connect_web import __version__
 from health_connect_web.config import get_settings
 from health_connect_web.db import get_db
 from health_connect_web.models import create_all
-from health_connect_web.web import auth, queries
+from health_connect_web.web import auth, content, exports, queries
 
 log = logging.getLogger(__name__)
 
@@ -124,6 +124,7 @@ def create_app() -> FastAPI:
                 "user": user,
                 "summary": queries.landing_summary(db),
                 "combined_micros": queries.combined_daily_intake(db, food_days=7),
+                "freshness": queries.data_freshness(db),
             },
         )
 
@@ -166,6 +167,52 @@ def create_app() -> FastAPI:
                 "top_meals": queries.top_meals(db, days=30, limit=15),
                 "latest_log_at": queries.latest_nutrition_at(db),
             },
+        )
+
+    @app.get("/export.md", name="export_markdown")
+    async def export_markdown(
+        user: dict = Depends(auth.require_user),
+        db: Session = Depends(get_db),
+    ):
+        _ = user  # auth gate only
+        content = exports.build_export_markdown(db)
+        from datetime import date
+
+        from fastapi.responses import Response
+
+        return Response(
+            content,
+            media_type="text/markdown; charset=utf-8",
+            headers={
+                "Content-Disposition": f'attachment; filename="health-portfolio-{date.today()}.md"',
+            },
+        )
+
+    @app.get("/teas", response_class=HTMLResponse, name="page_teas")
+    async def page_teas(
+        request: Request,
+        user: dict = Depends(auth.require_user),
+        db: Session = Depends(get_db),
+    ):
+        return templates.TemplateResponse(
+            request,
+            "teas.html",
+            {
+                "user": user,
+                "herbs": queries.herbs(db),
+                "brewing": content.tea_brewing(),
+            },
+        )
+
+    @app.get("/schedule", response_class=HTMLResponse, name="page_schedule")
+    async def page_schedule(
+        request: Request,
+        user: dict = Depends(auth.require_user),
+    ):
+        return templates.TemplateResponse(
+            request,
+            "schedule.html",
+            {"user": user, "data": content.schedule_data()},
         )
 
     @app.get("/supplements", response_class=HTMLResponse, name="page_supplements")

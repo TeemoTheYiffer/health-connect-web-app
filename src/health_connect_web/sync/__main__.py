@@ -82,6 +82,11 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as e:
         log.warning("Supplement seed failed (continuing with health sync): %s", e)
 
+    try:
+        supplements.seed_herbs_from_toml()
+    except Exception as e:
+        log.warning("Herb seed failed (continuing with health sync): %s", e)
+
     if "--local" in (argv or sys.argv[1:]) or args.local is not None:
         path = args.local or settings.local_health_connect_db
         if not path:

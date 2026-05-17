@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Teas | Health Portfolio{% endblock %}
+{% block content %}
+<h1>Teas &amp; Herbal Ingredients</h1>
+<p class="muted">
+  I drink two daily brews. Listed below at the ingredient level so a prescriber can
+  scan for herb-drug interactions before writing anything new. {{ herbs | length }} item{{ '' if herbs | length == 1 else 's' }}.
+</p>
+
+{% if herbs %}
+<div class="vitamins-filter">
+  <div class="filter-group" role="tablist" aria-label="Filter by blend">
+    <button type="button" class="filter-chip active" data-kind="all">All</button>
+    <button type="button" class="filter-chip" data-kind="morning">Morning</button>
+    <button type="button" class="filter-chip" data-kind="nighttime">Nighttime</button>
+    <button type="button" class="filter-chip" data-kind="both">Both</button>
+  </div>
+  <input
+    type="search"
+    id="vitSearch"
+    class="filter-search"
+    placeholder="Search name, effect, or interaction..."
+    autocomplete="off"
+  >
+  <span class="muted small"><span id="vitCount">{{ herbs | length }}</span> shown</span>
+</div>
+
+<div class="table-scroll">
+<table class="data-table wide vitamins-table">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Blend</th>
+      <th>Amount</th>
+      <th>Effects</th>
+      <th>Drug interactions</th>
+      <th>Notes</th>
+      <th>Vendor</th>
+    </tr>
+  </thead>
+  <tbody id="vitBody">
+    {% for h in herbs %}
+      <tr data-kind="{{ h.blend }}"
+          data-search="{{ ((h.name or '') ~ ' ' ~ (h.effects or '') ~ ' ' ~ (h.drug_interactions or '') ~ ' ' ~ (h.vendor or '')) | lower }}">
+        <td>
+          <strong>{{ h.name }}</strong>
+          {% if h.url %}<br><a class="muted small-link" href="{{ h.url }}" target="_blank" rel="noopener">[Link]</a>{% endif %}
+        </td>
+        <td><span class="kind-tag kind-{{ h.blend }}">{{ h.blend }}</span></td>
+        <td>{{ h.amount or '' }}</td>
+        <td class="cell-prose">{{ h.effects or '' }}</td>
+        <td class="cell-prose">{{ h.drug_interactions or '' }}</td>
+        <td class="cell-prose">{{ h.notes or '' }}</td>
+        <td>{{ h.vendor or '' }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+<p id="vitEmpty" class="muted" hidden>No items match.</p>
+
+<script src="{{ url_for('static', path='vitamins.js') }}" defer></script>
+{% else %}
+  <p class="muted">No items yet. Edit <code>teas.toml</code> and re-run the sync job.</p>
+{% endif %}
+
+{% if brewing and brewing.sections %}
+<section class="schedule-section" style="margin-top:48px;">
+  <h2>Brewing Protocols</h2>
+  {% if brewing.intro %}<p class="muted small">{{ brewing.intro }}</p>{% endif %}
+
+  {% for section in brewing.sections %}
+    <h3>{{ section.title }}</h3>
+    {% if section.items %}
+      <ul>
+        {% for item in section.items %}<li>{{ item }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+</section>
+{% endif %}
+{% endblock %}
