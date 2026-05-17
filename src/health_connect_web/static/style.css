@@ -181,7 +181,9 @@ body {
 }
 .kind-tag.kind-drug { background: rgba(224, 124, 124, 0.18); color: var(--bad); }
 .kind-tag.kind-supplement { background: rgba(93, 211, 158, 0.18); color: var(--good); }
-.kind-tag.kind-morning { background: rgba(244, 184, 96, 0.18); color: var(--warn); }
+/* Morning blend = OJ-orange. More saturated + opaque than the other tags so the
+   day/night split reads at a glance on the /teas page. */
+.kind-tag.kind-morning { background: rgba(255, 140, 0, 0.28); color: #ffb347; }
 .kind-tag.kind-nighttime { background: rgba(120, 130, 200, 0.22); color: #aeb8ff; }
 .kind-tag.kind-both { background: rgba(78, 161, 255, 0.18); color: var(--accent); }
 .small-link { font-size: 11px; }

@@ -476,9 +476,24 @@ def latest_sync(s: Session) -> m.SyncRun | None:
 
 # --- Per-chart payload functions for /health (used by both initial render and the
 #     dropdown-driven /api/health/{chart} endpoint).
+#
+# All windows anchor to the most recent record for that metric so a "7-day" view
+# always shows the last 7 days of actual data, even if my latest reading is older
+# than that (e.g. I take BP every few days). Same pattern as the Food page.
+
+
+def _anchored_rows(s: Session, model, time_col, days: int) -> list:
+    end = s.execute(select(func.max(time_col))).scalar()
+    if end is None:
+        return []
+    start = end - timedelta(days=days)
+    return list(
+        s.execute(select(model).where(time_col >= start, time_col <= end).order_by(time_col)).scalars()
+    )
+
 
 def bp_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
-    rows = recent_blood_pressure(s, days=days)
+    rows = _anchored_rows(s, m.BloodPressure, m.BloodPressure.time, days)
     return {
         "labels": [r.time.strftime("%Y-%m-%d") for r in rows],
         "systolic": [r.systolic for r in rows],
@@ -487,7 +502,7 @@ def bp_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
 
 
 def weight_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
-    rows = recent_weight(s, days=days)
+    rows = _anchored_rows(s, m.Weight, m.Weight.time, days)
     return {
         "labels": [r.time.strftime("%Y-%m-%d") for r in rows],
         "kg": [round(r.weight_g / 1000.0, 1) for r in rows],
@@ -495,17 +510,44 @@ def weight_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
 
 
 def steps_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
-    pts = daily_steps(s, days=days)
-    return {"labels": [p.t for p in pts], "values": [p.v for p in pts]}
+    end = s.execute(select(func.max(m.Steps.start_time))).scalar()
+    if end is None:
+        return {"labels": [], "values": []}
+    start = end - timedelta(days=days)
+    rows = s.execute(
+        select(
+            func.date(m.Steps.start_time).label("d"),
+            func.sum(m.Steps.count).label("n"),
+        )
+        .where(m.Steps.start_time >= start, m.Steps.start_time <= end)
+        .group_by(func.date(m.Steps.start_time))
+        .order_by(func.date(m.Steps.start_time))
+    ).all()
+    return {"labels": [str(r.d) for r in rows], "values": [int(r.n or 0) for r in rows]}
 
 
 def calories_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
-    pts = daily_calories_burned(s, days=days)
-    return {"labels": [p.t for p in pts], "values": [p.v for p in pts]}
+    end = s.execute(select(func.max(m.TotalCalories.start_time))).scalar()
+    if end is None:
+        return {"labels": [], "values": []}
+    start = end - timedelta(days=days)
+    rows = s.execute(
+        select(
+            func.date(m.TotalCalories.start_time).label("d"),
+            func.sum(m.TotalCalories.energy_cal).label("e"),
+        )
+        .where(m.TotalCalories.start_time >= start, m.TotalCalories.start_time <= end)
+        .group_by(func.date(m.TotalCalories.start_time))
+        .order_by(func.date(m.TotalCalories.start_time))
+    ).all()
+    return {
+        "labels": [str(r.d) for r in rows],
+        "values": [round((r.e or 0) / 1000.0, 0) for r in rows],
+    }
 
 
 def rhr_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
-    rows = recent_resting_hr(s, days=days)
+    rows = _anchored_rows(s, m.RestingHeartRate, m.RestingHeartRate.time, days)
     return {
         "labels": [r.time.strftime("%Y-%m-%d") for r in rows],
         "values": [r.bpm for r in rows],
