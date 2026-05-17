@@ -50,7 +50,9 @@ resource "google_project_service" "services" {
     "iam.googleapis.com",
     "iamcredentials.googleapis.com",
     "compute.googleapis.com",
-    "drive.googleapis.com", # for the sync job's SA to read the Drive folder
+    "drive.googleapis.com",                # for the sync job's SA to read the Drive folder
+    "cloudbuild.googleapis.com",           # for CI builds via `gcloud builds submit`
+    "cloudresourcemanager.googleapis.com", # silences gcloud project-verification warnings in CI
   ])
   service            = each.key
   disable_on_destroy = false

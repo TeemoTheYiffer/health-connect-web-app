@@ -77,7 +77,11 @@ build:
   rules:
     - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
   script:
-    - gcloud builds submit --tag "$IMAGE:$CI_COMMIT_SHORT_SHA" --tag "$IMAGE:latest" .
+    # `gcloud builds submit --tag` accepts a single value; multiple --tag flags
+    # silently keep only the last. Push the SHA tag only; deploy references the same.
+    # :latest tracks via Artifact Registry's "latest-pushed" semantics or via a
+    # separate `gcloud artifacts docker tags add ... latest` step if needed.
+    - gcloud builds submit --tag "$IMAGE:$CI_COMMIT_SHORT_SHA" .
 
 # ---------- deploy: roll new image to Cloud Run service + job ----------
 
