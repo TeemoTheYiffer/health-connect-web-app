@@ -58,43 +58,56 @@
     }
     inited = true;
 
-    const bp = getJSON("bpData");
-    if (bp) {
-      lineChart("bpChart", bp.labels, [
-        { label: "Systolic", data: bp.systolic, borderColor: "#e07c7c", backgroundColor: "rgba(224,124,124,0.2)", tension: 0.2 },
-        { label: "Diastolic", data: bp.diastolic, borderColor: "#4ea1ff", backgroundColor: "rgba(78,161,255,0.2)", tension: 0.2 },
-      ]);
+    // Each renderer takes (canvasId, payload) and draws a chart. Used both for
+    // the initial render from <script> JSON blocks and the dropdown-driven refetch.
+    const RENDERERS = {
+      bpChart: (id, p) => lineChart(id, p.labels, [
+        { label: "Systolic", data: p.systolic, borderColor: "#e07c7c", backgroundColor: "rgba(224,124,124,0.2)", tension: 0.2 },
+        { label: "Diastolic", data: p.diastolic, borderColor: "#4ea1ff", backgroundColor: "rgba(78,161,255,0.2)", tension: 0.2 },
+      ]),
+      weightChart: (id, p) => lineChart(id, p.labels, [
+        { label: "Weight (kg)", data: p.kg, borderColor: "#5dd39e", backgroundColor: "rgba(93,211,158,0.2)", tension: 0.2 },
+      ]),
+      stepsChart: (id, p) => barChart(id, p.labels, "Steps", p.values, "#4ea1ff"),
+      caloriesChart: (id, p) => barChart(id, p.labels, "kcal", p.values, "#f4b860"),
+      rhrChart: (id, p) => lineChart(id, p.labels, [
+        { label: "Resting HR", data: p.values, borderColor: "#5dd39e", backgroundColor: "rgba(93,211,158,0.2)", tension: 0.2 },
+      ]),
+      macrosChart: (id, p) => lineChart(id, p.labels, [
+        { label: "kcal", data: p.kcal, borderColor: "#f4b860", backgroundColor: "rgba(244,184,96,0.2)", tension: 0.2 },
+        { label: "Protein g", data: p.protein, borderColor: "#5dd39e", tension: 0.2 },
+        { label: "Carbs g", data: p.carbs, borderColor: "#4ea1ff", tension: 0.2 },
+        { label: "Fat g", data: p.fat, borderColor: "#e07c7c", tension: 0.2 },
+      ]),
+    };
+
+    // Map canvas IDs to the JSON <script> tag IDs holding their initial payload.
+    const INITIAL_DATA = {
+      bpChart: "bpData",
+      weightChart: "weightData",
+      stepsChart: "stepsData",
+      caloriesChart: "caloriesData",
+      rhrChart: "rhrData",
+      macrosChart: "macrosData",
+    };
+
+    for (const [canvasId, dataId] of Object.entries(INITIAL_DATA)) {
+      const payload = getJSON(dataId);
+      if (payload && RENDERERS[canvasId]) RENDERERS[canvasId](canvasId, payload);
     }
-
-    const w = getJSON("weightData");
-    if (w) {
-      lineChart("weightChart", w.labels, [
-        { label: "Weight (kg)", data: w.kg, borderColor: "#5dd39e", backgroundColor: "rgba(93,211,158,0.2)", tension: 0.2 },
-      ]);
-    }
-
-    const steps = getJSON("stepsData");
-    if (steps) barChart("stepsChart", steps.labels, "Steps", steps.values, "#4ea1ff");
-
-    const cals = getJSON("caloriesData");
-    if (cals) barChart("caloriesChart", cals.labels, "kcal", cals.values, "#f4b860");
-
-    const rhr = getJSON("rhrData");
-    if (rhr) {
-      lineChart("rhrChart", rhr.labels, [
-        { label: "Resting HR", data: rhr.values, borderColor: "#5dd39e", backgroundColor: "rgba(93,211,158,0.2)", tension: 0.2 },
-      ]);
-    }
-
-    const macros = getJSON("macrosData");
-    if (macros) renderMacros("macrosChart", macros);
 
     // Dropdown range pickers: <select data-target="canvasId" data-endpoint="/api/...">.
+    // The endpoint returns either { chart: <data> } (food) or { data: <data> } (health).
     document.querySelectorAll("select[data-target][data-endpoint]").forEach((sel) => {
       sel.addEventListener("change", async () => {
         const target = sel.dataset.target;
         const endpoint = sel.dataset.endpoint;
         const days = sel.value;
+        const renderer = RENDERERS[target];
+        if (!renderer) {
+          console.warn("No renderer for target", target);
+          return;
+        }
         sel.disabled = true;
         try {
           const res = await fetch(`${endpoint}?days=${encodeURIComponent(days)}`, {
@@ -102,8 +115,8 @@
           });
           if (!res.ok) throw new Error(`HTTP ${res.status}`);
           const body = await res.json();
-          // Chart-specific dispatch, currently only macrosChart, easy to extend later.
-          if (target === "macrosChart") renderMacros(target, body.chart);
+          const payload = body.data || body.chart; // tolerate either response shape
+          renderer(target, payload);
         } catch (e) {
           console.error("Chart refresh failed:", e);
         } finally {
@@ -111,15 +124,6 @@
         }
       });
     });
-  }
-
-  function renderMacros(canvasId, payload) {
-    lineChart(canvasId, payload.labels, [
-      { label: "kcal", data: payload.kcal, borderColor: "#f4b860", backgroundColor: "rgba(244,184,96,0.2)", tension: 0.2 },
-      { label: "Protein g", data: payload.protein, borderColor: "#5dd39e", tension: 0.2 },
-      { label: "Carbs g", data: payload.carbs, borderColor: "#4ea1ff", tension: 0.2 },
-      { label: "Fat g", data: payload.fat, borderColor: "#e07c7c", tension: 0.2 },
-    ]);
   }
 
   if (document.readyState === "loading") {

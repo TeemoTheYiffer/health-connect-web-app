@@ -19,6 +19,7 @@
       <a href="{{ url_for('page_supplements') }}" class="{% if request.url.path == '/supplements' %}active{% endif %}">Supplements</a>
       <a href="{{ url_for('page_teas') }}" class="{% if request.url.path == '/teas' %}active{% endif %}">Teas</a>
       <a href="{{ url_for('page_schedule') }}" class="{% if request.url.path == '/schedule' %}active{% endif %}">Schedule</a>
+      <a href="{{ url_for('page_data') }}" class="{% if request.url.path == '/data' %}active{% endif %}">Data</a>
     </nav>
     <div class="user">
       <span class="user-name">{{ user.name }}</span>

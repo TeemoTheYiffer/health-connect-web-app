@@ -71,9 +71,11 @@
 
   {% for section in brewing.sections %}
     <h3>{{ section.title }}</h3>
-    {% if section.items %}
+    {# bracket access forces __getitem__ ('items' as a dict key) instead of
+       getattr (which picks up the built-in dict.items method). Same below. #}
+    {% if section['items'] %}
       <ul>
-        {% for item in section.items %}<li>{{ item }}</li>{% endfor %}
+        {% for item in section['items'] %}<li>{{ item }}</li>{% endfor %}
       </ul>
     {% endif %}
   {% endfor %}

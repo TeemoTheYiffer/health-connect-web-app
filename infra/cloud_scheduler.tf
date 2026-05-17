@@ -8,8 +8,8 @@ resource "google_cloud_run_v2_job_iam_member" "scheduler_invoker" {
 }
 
 resource "google_cloud_scheduler_job" "daily_sync" {
-  name        = "${local.job_name}-daily"
-  description = "Daily Drive -> Cloud SQL sync trigger"
+  name        = "${local.job_name}-cron"
+  description = "Drive -> Cloud SQL sync trigger (every 4 hours by default; see var.cron_schedule)"
   schedule    = var.cron_schedule
   time_zone   = var.timezone
   region      = var.region

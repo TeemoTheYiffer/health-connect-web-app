@@ -109,6 +109,22 @@ def create_app() -> FastAPI:
         daily = queries.daily_nutrition(db, days=days)
         return {"days": days, "chart": queries.food_chart_data(daily)}
 
+    @app.get("/api/health/{chart}")
+    async def api_health_chart(
+        chart: str,
+        days: int = 7,
+        user: dict = Depends(auth.require_user),
+        db: Session = Depends(get_db),
+    ):
+        _ = user  # auth gate only
+        days = max(1, min(int(days), 365))
+        builder = queries.HEALTH_CHART_BUILDERS.get(chart)
+        if builder is None:
+            from fastapi import HTTPException
+
+            raise HTTPException(status_code=404, detail=f"Unknown chart: {chart}")
+        return {"chart": chart, "days": days, "data": builder(db, days=days)}
+
     # ---- Authenticated pages ----
 
     @app.get("/", response_class=HTMLResponse, name="index")
@@ -124,7 +140,6 @@ def create_app() -> FastAPI:
                 "user": user,
                 "summary": queries.landing_summary(db),
                 "combined_micros": queries.combined_daily_intake(db, food_days=7),
-                "freshness": queries.data_freshness(db),
             },
         )
 
@@ -185,6 +200,23 @@ def create_app() -> FastAPI:
             media_type="text/markdown; charset=utf-8",
             headers={
                 "Content-Disposition": f'attachment; filename="health-portfolio-{date.today()}.md"',
+            },
+        )
+
+    @app.get("/data", response_class=HTMLResponse, name="page_data")
+    async def page_data(
+        request: Request,
+        user: dict = Depends(auth.require_user),
+        db: Session = Depends(get_db),
+    ):
+        return templates.TemplateResponse(
+            request,
+            "data.html",
+            {
+                "user": user,
+                "summary": queries.landing_summary(db),
+                "freshness": queries.data_freshness(db),
+                "recent_runs": queries.recent_sync_runs(db, limit=10),
             },
         )
 

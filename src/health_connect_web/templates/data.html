@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Data | Health Portfolio{% endblock %}
+{% block content %}
+<div style="display:flex; align-items:baseline; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+  <h1 style="margin:0;">Data</h1>
+  <a class="btn-secondary" href="{{ url_for('export_markdown') }}" title="Download a Markdown summary of headline stats, supplements, teas, and recent data. Suitable for sharing with a clinician or pasting into Claude / ChatGPT for review.">Download export (.md) ↓</a>
+</div>
+<p class="muted">Sync metadata + freshness per Health-Connect-sourced table. Use the export button to grab a Markdown doc covering the full picture (headline stats, micros, recent BP / weight / sleep / workouts, supplements, teas).</p>
+
+{% if summary.last_sync %}
+<section class="dv-tally">
+  <h2>Sync Status</h2>
+  <p class="muted">
+    Last sync: {{ summary.last_sync.started_at.strftime('%Y-%m-%d %H:%M UTC') }}
+    ({{ summary.last_sync.status }}, {{ '{:,}'.format(summary.last_sync.rows_upserted) }} rows).
+    {% if summary.last_sync.file_modified_at %}
+      Source file last modified: {{ summary.last_sync.file_modified_at.strftime('%Y-%m-%d %H:%M UTC') }}.
+      {% set source_age = (summary.last_sync.started_at - summary.last_sync.file_modified_at).days %}
+      {% if source_age > 2 %}
+        <strong>Heads up: source file is {{ source_age }} days older than the sync; check the phone's Health Connect export.</strong>
+      {% endif %}
+    {% endif %}
+  </p>
+</section>
+{% endif %}
+
+{% if freshness %}
+<section class="dv-tally">
+  <h2>Data Freshness</h2>
+  <p class="muted small">Latest record per table. If one table lags well behind the others, the upstream feed for that data type is broken (most often MacroFactor &rarr; Health Connect when nutrition stalls).</p>
+  <table class="data-table dv-table">
+    <thead>
+      <tr><th>Source</th><th>Records</th><th>Latest record</th><th>Days behind</th></tr>
+    </thead>
+    <tbody>
+      {% for r in freshness %}
+        {% set days_behind = (summary.last_sync.started_at - r.latest).days if r.latest and summary.last_sync else None %}
+        <tr>
+          <td><strong>{{ r.label }}</strong></td>
+          <td>{{ '{:,}'.format(r.count) }}</td>
+          <td>{% if r.latest %}{{ r.latest.strftime('%Y-%m-%d') }}{% else %}<span class="muted">n/a</span>{% endif %}</td>
+          <td>
+            {% if days_behind is not none %}
+              {% if days_behind <= 1 %}
+                <span class="pct-bar pct-bar-good" style="--pct: 100%;">{{ days_behind }}d</span>
+              {% elif days_behind <= 3 %}
+                <span class="pct-bar pct-bar-mid" style="--pct: 100%;">{{ days_behind }}d</span>
+              {% else %}
+                <span class="pct-bar pct-bar-bad" style="--pct: 100%;">{{ days_behind }}d</span>
+              {% endif %}
+            {% else %}<span class="muted small">n/a</span>{% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+
+{% if recent_runs %}
+<section class="dv-tally">
+  <h2>Recent Sync Runs</h2>
+  <table class="data-table dv-table">
+    <thead>
+      <tr><th>Started</th><th>Source</th><th>Status</th><th>Rows</th><th>Source file modified</th></tr>
+    </thead>
+    <tbody>
+      {% for r in recent_runs %}
+        <tr>
+          <td>{{ r.started_at.strftime('%Y-%m-%d %H:%M UTC') }}</td>
+          <td>{{ r.source }}</td>
+          <td>
+            {% if r.status == 'success' %}
+              <span class="pct-bar pct-bar-good" style="--pct: 100%;">{{ r.status }}</span>
+            {% else %}
+              <span class="pct-bar pct-bar-bad" style="--pct: 100%;">{{ r.status }}</span>
+            {% endif %}
+          </td>
+          <td>{{ '{:,}'.format(r.rows_upserted) }}</td>
+          <td>{% if r.file_modified_at %}{{ r.file_modified_at.strftime('%Y-%m-%d %H:%M UTC') }}{% else %}<span class="muted small">n/a</span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endif %}
+{% endblock %}

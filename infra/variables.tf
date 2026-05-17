@@ -17,9 +17,9 @@ variable "image_tag" {
 }
 
 variable "cron_schedule" {
-  description = "Cloud Scheduler cron expression for the daily sync."
+  description = "Cloud Scheduler cron expression for the Drive -> Cloud SQL sync. Every 4 hours so a missed window (e.g. phone hasn't pushed yet) self-heals on the next cycle."
   type        = string
-  default     = "0 7 * * *"
+  default     = "0 */4 * * *"
 }
 
 variable "timezone" {

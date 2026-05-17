@@ -309,6 +309,11 @@ _FRESHNESS_SOURCES: list[tuple[str, Any, Any]] = [
 ]
 
 
+def recent_sync_runs(s: Session, limit: int = 10) -> list[m.SyncRun]:
+    """Audit log of recent sync jobs, newest first. Drives the /data page table."""
+    return list(s.execute(select(m.SyncRun).order_by(desc(m.SyncRun.started_at)).limit(limit)).scalars())
+
+
 def data_freshness(s: Session) -> list[dict[str, Any]]:
     """Latest record timestamp + row count per Health-Connect-sourced table.
 
@@ -469,37 +474,57 @@ def latest_sync(s: Session) -> m.SyncRun | None:
     return s.execute(select(m.SyncRun).order_by(desc(m.SyncRun.started_at)).limit(1)).scalar_one_or_none()
 
 
-def health_chart_data(s: Session) -> dict[str, dict[str, list]]:
-    """Pre-shape Chart.js payloads for the General Health page (Jinja can't do comprehensions)."""
-    bp_recent = recent_blood_pressure(s, days=90)
-    weight_recent = recent_weight(s, days=180)
-    steps_30 = daily_steps(s, days=30)
-    cals_30 = daily_calories_burned(s, days=30)
-    rhr = recent_resting_hr(s, days=60)
+# --- Per-chart payload functions for /health (used by both initial render and the
+#     dropdown-driven /api/health/{chart} endpoint).
 
+def bp_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
+    rows = recent_blood_pressure(s, days=days)
     return {
-        "bp": {
-            "labels": [r.time.strftime("%Y-%m-%d") for r in bp_recent],
-            "systolic": [r.systolic for r in bp_recent],
-            "diastolic": [r.diastolic for r in bp_recent],
-        },
-        "weight": {
-            "labels": [r.time.strftime("%Y-%m-%d") for r in weight_recent],
-            "kg": [round(r.weight_g / 1000.0, 1) for r in weight_recent],
-        },
-        "steps": {
-            "labels": [p.t for p in steps_30],
-            "values": [p.v for p in steps_30],
-        },
-        "calories": {
-            "labels": [p.t for p in cals_30],
-            "values": [p.v for p in cals_30],
-        },
-        "rhr": {
-            "labels": [r.time.strftime("%Y-%m-%d") for r in rhr],
-            "values": [r.bpm for r in rhr],
-        },
+        "labels": [r.time.strftime("%Y-%m-%d") for r in rows],
+        "systolic": [r.systolic for r in rows],
+        "diastolic": [r.diastolic for r in rows],
     }
+
+
+def weight_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
+    rows = recent_weight(s, days=days)
+    return {
+        "labels": [r.time.strftime("%Y-%m-%d") for r in rows],
+        "kg": [round(r.weight_g / 1000.0, 1) for r in rows],
+    }
+
+
+def steps_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
+    pts = daily_steps(s, days=days)
+    return {"labels": [p.t for p in pts], "values": [p.v for p in pts]}
+
+
+def calories_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
+    pts = daily_calories_burned(s, days=days)
+    return {"labels": [p.t for p in pts], "values": [p.v for p in pts]}
+
+
+def rhr_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
+    rows = recent_resting_hr(s, days=days)
+    return {
+        "labels": [r.time.strftime("%Y-%m-%d") for r in rows],
+        "values": [r.bpm for r in rows],
+    }
+
+
+HEALTH_CHART_BUILDERS = {
+    "bp": bp_chart_payload,
+    "weight": weight_chart_payload,
+    "steps": steps_chart_payload,
+    "calories": calories_chart_payload,
+    "rhr": rhr_chart_payload,
+}
+
+
+def health_chart_data(s: Session, default_days: int = 7) -> dict[str, dict[str, list]]:
+    """Initial chart payloads for /health. Each chart has its own dropdown that can
+    fetch a different window via /api/health/{chart}."""
+    return {kind: fn(s, days=default_days) for kind, fn in HEALTH_CHART_BUILDERS.items()}
 
 
 def food_chart_data(daily: list[dict[str, Any]]) -> dict[str, list]:
