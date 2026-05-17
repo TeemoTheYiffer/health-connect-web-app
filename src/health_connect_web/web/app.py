@@ -18,7 +18,7 @@ from health_connect_web import __version__
 from health_connect_web.config import get_settings
 from health_connect_web.db import get_db
 from health_connect_web.models import create_all
-from health_connect_web.web import auth, exports, queries
+from health_connect_web.web import auth, content, exports, queries
 
 log = logging.getLogger(__name__)
 
@@ -197,7 +197,11 @@ def create_app() -> FastAPI:
         return templates.TemplateResponse(
             request,
             "teas.html",
-            {"user": user, "herbs": queries.herbs(db)},
+            {
+                "user": user,
+                "herbs": queries.herbs(db),
+                "brewing": content.tea_brewing(),
+            },
         )
 
     @app.get("/schedule", response_class=HTMLResponse, name="page_schedule")
@@ -205,7 +209,11 @@ def create_app() -> FastAPI:
         request: Request,
         user: dict = Depends(auth.require_user),
     ):
-        return templates.TemplateResponse(request, "schedule.html", {"user": user})
+        return templates.TemplateResponse(
+            request,
+            "schedule.html",
+            {"user": user, "data": content.schedule_data()},
+        )
 
     @app.get("/supplements", response_class=HTMLResponse, name="page_supplements")
     async def page_supplements(

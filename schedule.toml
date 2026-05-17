@@ -1,0 +1,148 @@
+# Joe's daily supplement / training schedule. Source-of-truth content for /schedule.
+# Edit this file (no template changes needed) and the page reflects on the next request.
+
+[meta]
+last_updated = "2026-05-10"
+context = "Cutting phase, OMAD 7-9pm, 5x/week training, ZMA phased out and replaced with Zinc Picolinate."
+chronotype = "Wake ~10am, sleep ~2am"
+
+# -------- Core design principles (numbered list) --------
+
+[[core_principles]]
+title = "Zinc / copper coupling"
+body = "30 mg Zinc Picolinate (AM) plus 15 mg from Prostate Essentials Plus (OMAD) deliberately balanced against 4 mg copper from Sodium Copper Chlorophyllin. If I drop chlorophyllin, I drop picolinate to 15 mg."
+
+[[core_principles]]
+title = "Mineral antagonism is acceptable"
+body = "I'm over UL on both zinc (45 mg vs 40 mg) and supplemental magnesium (444 mg vs 350 mg). Co-timing minerals to attenuate peaks is desired, not avoided."
+
+[[core_principles]]
+title = "AM coffee + non-dairy creamer acts as a nausea buffer"
+body = "Coffee polyphenols cut zinc absorption ~15-20%, which is acceptable given my over-UL status and provides built-in GI protection."
+
+[[core_principles]]
+title = "OMAD is my main absorption window for fat-solubles"
+body = "Vitamin D, K2, omega-3, curcumin, resveratrol all need dietary fat."
+
+[[core_principles]]
+title = "Bedtime is reserved for sleep-supportive items only"
+body = "MagTech for sedation. No stimulating compounds, no zinc layering."
+
+[[core_principles]]
+title = "Stimulating adaptogens (ginseng, cordyceps) clear before bedtime"
+body = "Given 2am sleep target and ~5-7 h half-lives, late afternoon is the latest safe dosing window."
+
+[[core_principles]]
+title = "Caffeine cutoff is 4pm absolute"
+body = "10 h of clearance before bedtime protects deep sleep quality, not just sleep onset."
+
+# -------- Training-day schedule --------
+
+[training_day]
+intro = "Wake ~10am | Workout 7-8pm | OMAD 8-9pm | Sleep ~2am"
+
+[[training_day.slots]]
+time = "Wake (~10am)"
+items = "Cardamom tea (15 pods brewed)"
+purpose = "Hydration, digestive prep."
+
+[[training_day.slots]]
+time = "~10-11am (with coffee + non-dairy creamer)"
+items = "Zinc Picolinate 30 mg, Triple Magnesium Complex 300 mg, Korean Panax Ginseng (2 caps = 1000 mg / 100 mg ginsenosides)"
+purpose = "Co-timed. Coffee buffers zinc nausea. Ginseng + caffeine synergy lands during peak work hours."
+
+[[training_day.slots]]
+time = "2pm"
+items = "Psyllium Husk 9 g, Creatine 10 g"
+purpose = "Anchor dose. Minimum 2 h buffer from morning minerals."
+
+[[training_day.slots]]
+time = "4pm (optional)"
+items = "Yerba Mate (150 mg caffeine) or Bing Energy (~120 mg caffeine + B-vits + taurine)"
+purpose = "Absolute caffeine cutoff. Pick by preference."
+
+[[training_day.slots]]
+time = "4pm"
+items = "Sodium Copper Chlorophyllin 100 mg"
+purpose = "Afternoon deodorizing. Balances zinc / copper ratio."
+
+[[training_day.slots]]
+time = "6pm"
+items = "Tadalafil 5 mg (training-day dose)"
+purpose = "1 h before pre-workout for ~2 h peak overlap."
+
+[[training_day.slots]]
+time = "6:30pm"
+items = "Stim-Free Pre-Workout (1 scoop ~20 g), Cordyceps 1000 mg"
+purpose = "30 min pre-lift. Cordyceps for VO2max synergy on training days."
+
+[[training_day.slots]]
+time = "7-8pm"
+items = "Workout"
+purpose = ""
+
+[[training_day.slots]]
+time = "8-9pm OMAD start"
+items = "Mega D-3 & MK-7 (with fat); Ultimate Omega 2X; Turmeric + Boswellia; Glucosamine + Chondroitin; Resveratrol Elite; Vitamin E 180 mg; Lion's Mane; 5 Defenders; Molybdenum Chelated; Digestive Enzymes; Prostate Essentials Plus; Simethicone / Bean-Zyme (as needed)"
+purpose = "Big bolus with food. Fat-solubles, joint stack, functional mushrooms. Second 15 mg zinc dose (from Prostate Essentials) lands here."
+
+[[training_day.slots]]
+time = "~9:30-10pm"
+items = "Tribulus Terrestris 650 mg, Fenugreek 1000 mg"
+purpose = "Tail end of meal window. Considering dropping one, redundant with Prostate Essentials Plus."
+
+[[training_day.slots]]
+time = "Bedtime (~2am)"
+items = "MagTech Magnesium"
+purpose = "Sleep support, sedation aligned with bedtime."
+
+# -------- Rest-day deltas --------
+
+[rest_day]
+intro = "Wake ~10am | OMAD 7-8pm (earlier) | Sleep ~2am"
+intro_2 = "Same as training days with these changes:"
+changes = [
+  "Drop Stim-Free Pre-Workout.",
+  "Drop Tadalafil or move to 5pm for evening effect.",
+  "Creatine drops to 5 g, any time with water.",
+  "Cordyceps moves to 4pm with chlorophyllin (not with OMAD), clears bedtime by ~10 h.",
+  "Everything else shifts ~1 h earlier with the earlier OMAD window.",
+]
+rationale = "Why Cordyceps moves earlier on rest days: original plan had it at 8pm OMAD, but with 2am bedtime that's only ~6 h of clearance, borderline for its ~5-7 h half-life of stimulating compounds. 4pm gives ~10 h of clearance and groups it with the chlorophyllin dose."
+
+# -------- Caffeine rules --------
+
+[caffeine]
+intro = "Absolute cutoff: 4pm. Reasoning:"
+reasoning = [
+  "2am bedtime, 10 h = 4pm.",
+  "Caffeine half-life is 3-5 h, but even ~25-50 mg residual at bedtime suppresses deep sleep and REM.",
+  "Research shows 400 mg caffeine 6 h pre-bed reduces total sleep by ~1 h, even when not subjectively noticed.",
+  "10 h buffer protects sleep quality, not just sleep onset.",
+]
+ceiling = "Daily caffeine ceiling: ~300 mg. AM coffee (~100-150 mg) plus optional 4pm energy drink (~120-150 mg) stays under the FDA 400 mg/day safety threshold."
+note = "Bing's ~100 mg ginseng extract is ~5 mg ginsenosides. My AM Korean Panax dose is 1000 mg extract / 100 mg ginsenosides, so Bing adds ~5% on top, functionally trivial. No need to alternate for ginseng management."
+
+# Options compared at 4pm. Column headers + per-attribute rows so the template can
+# render the table dynamically without hardcoding option count.
+[caffeine.options_table]
+columns = ["Yerba Mate", "Bing Energy"]
+rows = [
+  { label = "Caffeine",     values = ["150 mg", "~120 mg"] },
+  { label = "Calories",     values = ["15", "25"] },
+  { label = "Added sugar",  values = ["0 g", "2 g"] },
+  { label = "Ginseng",      values = ["None", "~5 mg ginsenosides (trivial)"] },
+  { label = "B-vitamins",   values = ["None", "Loaded (100% DV B2 / B3 / B5 / B6 / B12)"] },
+  { label = "Taurine",      values = ["None", "Yes"] },
+  { label = "Best use",     values = ["Cleaner ingredients / cleaner fast", "Preferred on workout days for B-vits + taurine"] },
+]
+
+# -------- Key pairings --------
+
+[[pairings]]
+title = "AM Block: Zinc Picolinate + Triple Mag + Korean Panax + Coffee"
+body = "Single morning dose with non-dairy creamer coffee. Mutual mineral antagonism is desired since I'm over UL. Ginseng + caffeine synergy lands during peak cognitive hours. Full clearance by 2am bedtime."
+
+[[pairings]]
+title = "Zinc Picolinate (AM) + Sodium Copper Chlorophyllin (PM)"
+body = "Engineered as a coupled system. 7.5:1 zinc / copper from this pair alone, 11:1 total daily including Prostate Essentials Plus zinc. Within the healthy 8-12:1 range. Drop one, drop the other."

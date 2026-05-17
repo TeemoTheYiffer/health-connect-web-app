@@ -22,10 +22,11 @@ COPY src/ ./src/
 
 RUN pip install --no-cache-dir .
 
-# Source-of-truth TOML files for the supplement stack and herbal teas. The sync
-# job reads both on each run and upserts into the DB. Kept outside the package
-# so non-Python tooling (linters, GitLab UI) can read them directly from the repo.
-COPY vitamins.toml teas.toml ./
+# Source-of-truth TOML content files. vitamins.toml + teas.toml drive the
+# DB seed step in the sync job; schedule.toml + teas.toml's [brewing] block are
+# read at request time by the web app. Kept outside the package so non-Python
+# tooling (linters, GitLab UI) can read them directly from the repo.
+COPY vitamins.toml teas.toml schedule.toml ./
 
 # Drop privileges
 RUN useradd -u 1000 -m hcw && chown -R hcw:hcw /app

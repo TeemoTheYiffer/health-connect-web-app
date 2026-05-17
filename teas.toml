@@ -1,7 +1,7 @@
 # Joe's daily teas at the ingredient level. Doctors / nurses can use this to flag
 # herb-drug interactions before prescribing. Re-run via the hcw-sync job after edits.
 #
-# Fields:
+# [[items]] fields:
 #   slug                 unique upsert key.
 #   name                 ingredient + Latin name for unambiguous identification.
 #   blend                "morning" | "nighttime" | "both".
@@ -11,6 +11,54 @@
 #   notes                personal-use notes (optional).
 #   vendor / url         where I source it.
 #   sort_order           lower numbers first.
+#
+# [brewing] is read by the /teas page to render the brewing-protocols section.
+# Edit freely; no template changes needed.
+
+[brewing]
+intro = "Personal reference. Doctors can stop reading here, the clinical info is in the table above."
+
+[[brewing.sections]]
+title = "Morning cold brew (final)"
+items = [
+  "64 oz wide-mouth mason jar with 100-micron stainless mesh basket.",
+  "3-4 Harney sachets + 1-2 tsp Tiesta loose leaf.",
+  "Room-temp filtered water, 24 h in fridge.",
+  "No cardamom (won't extract cold). If wanted: hot-bloom 4 oz at 200 deg F for 5 min, add to jar.",
+]
+
+[[brewing.sections]]
+title = "Morning hot brew (interim)"
+items = [
+  "Breville at 200 deg F, 4-5 min steep.",
+  "Pour into 2 L metal flask filled with ice; sip cold throughout the day.",
+  "Cardamom: 2-3 lightly cracked pods works with spicy / warm blends, skip with hibiscus-heavy fruit blends.",
+]
+
+[[brewing.sections]]
+title = "Nighttime hot brew"
+items = [
+  "Breville at 200 deg F, 7 min, covered.",
+  "Catnip, linden, cardamom, calendula, chamomile, hibiscus, passion flower, lemongrass.",
+  "Pour into 2x 16 oz mason jars, cool on counter 60-90 min, then refrigerate. Drink chilled.",
+  "Brewed in the morning so Jar 1 is fully chilled by evening; Jar 2 is for the next night.",
+]
+
+[[brewing.sections]]
+title = "Why morning is 4-5 min and nighttime is 7 min"
+items = [
+  "Morning ceiling = 5 min: hibiscus over-extracts (tart) and decaf-black tannins go astringent past 5 min.",
+  "Nighttime floor = 7 min: crushed cardamom needs 6-8 min and the flower / leaf herbs release compounds slowly. No tannin-heavy black leaf to over-extract.",
+]
+
+[[brewing.sections]]
+title = "Caffeine rules"
+items = [
+  "Hard cutoff 4pm (2am bedtime, 10 h clearance).",
+  "Don't stack two decaf blacks in the same 2 L cold-brew jar; caffeine accumulates over a day-long sipping pattern.",
+  "Mexican Horchata oolong cut from rotation (80-120 mg / sachet incompatible with the 2 L sipping window).",
+]
+
 
 [[items]]
 slug = "decaf-black-tea"
