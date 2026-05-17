@@ -109,16 +109,22 @@
           return;
         }
         sel.disabled = true;
+        const url = `${endpoint}?days=${encodeURIComponent(days)}`;
         try {
-          const res = await fetch(`${endpoint}?days=${encodeURIComponent(days)}`, {
-            credentials: "same-origin",
-          });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          console.debug(`[charts] fetch ${url} -> #${target}`);
+          const res = await fetch(url, { credentials: "same-origin" });
+          if (!res.ok) throw new Error(`HTTP ${res.status} from ${url}`);
+          const ct = res.headers.get("content-type") || "";
+          if (!ct.includes("json")) {
+            // Most likely an auth redirect that returned HTML. Reload to re-auth.
+            throw new Error(`Non-JSON response (${ct}) from ${url}; session may have expired`);
+          }
           const body = await res.json();
           const payload = body.data || body.chart; // tolerate either response shape
+          if (!payload) throw new Error(`No payload in response: ${JSON.stringify(body).slice(0, 200)}`);
           renderer(target, payload);
         } catch (e) {
-          console.error("Chart refresh failed:", e);
+          console.error(`[charts] refresh failed for #${target}:`, e);
         } finally {
           sel.disabled = false;
         }

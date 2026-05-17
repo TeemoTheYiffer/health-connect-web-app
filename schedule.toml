@@ -43,8 +43,8 @@ intro = "Wake ~10am | Workout 7-8pm | OMAD 8-9pm | Sleep ~2am"
 
 [[training_day.slots]]
 time = "Wake (~10am)"
-items = "Cardamom tea (15 pods brewed)"
-purpose = "Hydration, digestive prep."
+items = "Morning cold brew ~60 g dry tea per batch (Harney fruit sachets + decaf blacks/oolong + Tiesta loose leaf + 15 cardamom pods). See /teas for the full ingredient list."
+purpose = "Hydration, digestive prep, mild BP-lowering from hibiscus content."
 
 [[training_day.slots]]
 time = "~10-11am (with coffee + non-dairy creamer)"
@@ -93,7 +93,7 @@ purpose = "Tail end of meal window. Considering dropping one, redundant with Pro
 
 [[training_day.slots]]
 time = "Bedtime (~2am)"
-items = "MagTech Magnesium"
+items = "MagTech Magnesium. Nighttime hot brew (~70 g dry herb per batch, drunk chilled across the evening): catnip, linden, calendula, chamomile, hibiscus, passion flower, lemongrass."
 purpose = "Sleep support, sedation aligned with bedtime."
 
 # -------- Rest-day deltas --------
