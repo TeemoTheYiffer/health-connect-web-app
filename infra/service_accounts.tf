@@ -47,6 +47,27 @@ resource "google_project_iam_member" "deployer_artifact_writer" {
   member  = "serviceAccount:${google_service_account.deployer.email}"
 }
 
+# Submit Cloud Build jobs (the CI pipeline calls `gcloud builds submit`).
+resource "google_project_iam_member" "deployer_cloudbuild_editor" {
+  project = var.project_id
+  role    = "roles/cloudbuild.builds.editor"
+  member  = "serviceAccount:${google_service_account.deployer.email}"
+}
+
+# Cloud Build uploads source to gs://<project>_cloudbuild before building.
+resource "google_project_iam_member" "deployer_storage_admin" {
+  project = var.project_id
+  role    = "roles/storage.admin"
+  member  = "serviceAccount:${google_service_account.deployer.email}"
+}
+
+# Cloud Build runs builds as a service account; let the deployer impersonate it.
+resource "google_project_iam_member" "deployer_sa_user_project" {
+  project = var.project_id
+  role    = "roles/iam.serviceAccountUser"
+  member  = "serviceAccount:${google_service_account.deployer.email}"
+}
+
 # Manage Cloud Run revisions (service + job).
 resource "google_project_iam_member" "deployer_run_admin" {
   project = var.project_id

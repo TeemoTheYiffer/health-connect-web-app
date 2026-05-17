@@ -1,17 +1,28 @@
-# Stub. Wire up when ready to deploy from CI; until then this just runs lint + tests.
-# When wiring up, follow the homebase-gcal-integration pattern but adapt to GitLab:
-#  - Use https://docs.gitlab.com/ee/ci/cloud_services/google_cloud/ to mint a GCP token
-#    via the project's OIDC ID token.
-#  - Push image to ${CI_REGISTRY} OR Artifact Registry directly.
-#  - Run `terraform plan` on MRs, `terraform apply` on main.
-#  - After apply, push out-of-band secret versions if changed.
+# CI/CD for health-connect-web-app.
 #
-# Required GitLab project variables (Settings > CI/CD > Variables):
-#   GCP_PROJECT_ID, GCP_WORKLOAD_IDENTITY_POOL, GCP_DEPLOYER_SA
+# Authentication to GCP uses Workload Identity Federation (no JSON keys):
+#   GitLab issues an OIDC ID token -> Google STS exchanges it for an access token
+#   that impersonates the `gitlab-deployer` service account.
+#
+# Pipeline shape:
+#   lint, test         -> every push (apply-mode formatters; don't block on drift)
+#   build, deploy      -> auto on main; rolls a new image to Cloud Run service + job
+#   terraform-apply    -> manual on main; click "play" in the UI to apply infra changes
 
 stages:
   - lint
   - test
+  - build
+  - deploy
+
+variables:
+  GCP_PROJECT_ID: "health-connect-web-app"
+  GCP_REGION: "us-west1"
+  GCP_DEPLOYER_SA: "gitlab-deployer@health-connect-web-app.iam.gserviceaccount.com"
+  GCP_WIF_PROVIDER: "projects/1093810433932/locations/global/workloadIdentityPools/gitlab-pool/providers/gitlab-provider"
+  IMAGE: "us-west1-docker.pkg.dev/health-connect-web-app/containers/hcw-web"
+
+# ---------- lint + test (every push) ----------
 
 default:
   image: python:3.12-slim
@@ -21,10 +32,9 @@ default:
 lint:
   stage: lint
   script:
-    # Apply-mode formatters: don't block the pipeline on drift. The runner's
-    # workspace gets fixed up; developers should also format locally before pushing
-    # (or set up a pre-commit hook). If formatting changes break parsing, that's
-    # caught here and the job still fails.
+    # Apply-mode formatters: don't block the pipeline on drift. Devs should also
+    # run these locally before pushing. If formatting changes break parsing, the
+    # job still fails (because ruff/black exit non-zero on parse errors).
     - ruff check --fix .
     - black .
 
@@ -32,3 +42,62 @@ test:
   stage: test
   script:
     - pytest
+
+# ---------- GCP auth (reusable) ----------
+# Mounts the GitLab OIDC token, configures gcloud to impersonate the deployer SA.
+
+.gcp-auth:
+  image: google/cloud-sdk:slim
+  id_tokens:
+    GCP_ID_TOKEN:
+      aud: "https://iam.googleapis.com/${GCP_WIF_PROVIDER}"
+  before_script:
+    - echo "$GCP_ID_TOKEN" > /tmp/oidc_token.txt
+    - |
+      cat > /tmp/sts-config.json <<EOF
+      {
+        "type": "external_account",
+        "audience": "//iam.googleapis.com/${GCP_WIF_PROVIDER}",
+        "subject_token_type": "urn:ietf:params:oauth:token-type:jwt",
+        "token_url": "https://sts.googleapis.com/v1/token",
+        "service_account_impersonation_url": "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${GCP_DEPLOYER_SA}:generateAccessToken",
+        "credential_source": {
+          "file": "/tmp/oidc_token.txt"
+        }
+      }
+      EOF
+    - gcloud auth login --cred-file=/tmp/sts-config.json
+    - gcloud config set project $GCP_PROJECT_ID
+
+# ---------- build container image + push to Artifact Registry ----------
+
+build:
+  extends: .gcp-auth
+  stage: build
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - gcloud builds submit --tag "$IMAGE:$CI_COMMIT_SHORT_SHA" --tag "$IMAGE:latest" .
+
+# ---------- deploy: roll new image to Cloud Run service + job ----------
+
+deploy:
+  extends: .gcp-auth
+  stage: deploy
+  needs: [build]
+  rules:
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+  script:
+    - gcloud run services update hcw-web --region "$GCP_REGION" --image "$IMAGE:$CI_COMMIT_SHORT_SHA" --quiet
+    - gcloud run jobs update hcw-sync --region "$GCP_REGION" --image "$IMAGE:$CI_COMMIT_SHORT_SHA" --quiet
+    - echo "Deployed $CI_COMMIT_SHORT_SHA"
+    - 'echo "Web: https://hcw-web-1093810433932.us-west1.run.app"'
+
+# NOTE: terraform apply is intentionally not in CI. It requires broad IAM
+# (Cloud SQL admin, Secret Manager admin, IAM admin, etc.) and can destroy
+# resources if a TF file is wrong. Run it locally when infra/ changes:
+#
+#   cd infra && terraform apply
+#
+# Future improvement: split TF into "safe" (Cloud Run, Scheduler) and "guarded"
+# (SQL, IAM) modules; auto-apply the safe one in CI, keep the guarded one local.
