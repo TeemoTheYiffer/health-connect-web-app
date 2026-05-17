@@ -39,10 +39,10 @@
         <tr>
           <td><strong>{{ slot.time }}</strong></td>
           {% if slot.purpose %}
-            <td>{{ slot.items }}</td>
+            <td>{{ slot['items'] }}</td>
             <td>{{ slot.purpose }}</td>
           {% else %}
-            <td colspan="2"><strong>{{ slot.items }}</strong></td>
+            <td colspan="2"><strong>{{ slot['items'] }}</strong></td>
           {% endif %}
         </tr>
       {% endfor %}
@@ -89,7 +89,7 @@
         {% for row in data.caffeine.options_table.rows %}
           <tr>
             <td>{{ row.label }}</td>
-            {% for v in row.values %}<td>{{ v }}</td>{% endfor %}
+            {% for v in row['values'] %}<td>{{ v }}</td>{% endfor %}
           </tr>
         {% endfor %}
       </tbody>
