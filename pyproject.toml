@@ -15,6 +15,7 @@ dependencies = [
     "uvicorn[standard]>=0.32",
     "jinja2>=3.1",
     "itsdangerous>=2.2",
+    "python-multipart>=0.0.9", # required by FastAPI Form(...) parsing on /admin POSTs
     "sqlalchemy>=2.0",
     "alembic>=1.13",
     "psycopg[binary]>=3.2",
