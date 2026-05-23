@@ -292,6 +292,61 @@ def herbs(s: Session) -> list[m.Herb]:
     return list(s.execute(select(m.Herb).order_by(m.Herb.sort_order, m.Herb.name)).scalars())
 
 
+# ---------- Allowlist (runtime-managed via /admin) ----------
+
+
+def list_allowed_emails(s: Session) -> list[m.AllowedEmail]:
+    return list(s.execute(select(m.AllowedEmail).order_by(m.AllowedEmail.email)).scalars())
+
+
+def is_email_in_db_allowlist(s: Session, email: str) -> bool:
+    e = email.strip().lower()
+    if not e:
+        return False
+    row = s.execute(select(m.AllowedEmail).where(m.AllowedEmail.email == e)).scalar_one_or_none()
+    return row is not None
+
+
+def add_allowed_email(
+    s: Session, email: str, added_by: str | None = None, note: str | None = None
+) -> m.AllowedEmail:
+    e = email.strip().lower()
+    row = m.AllowedEmail(email=e, added_at=datetime.now(UTC), added_by=added_by, note=note)
+    s.add(row)
+    s.flush()
+    return row
+
+
+def remove_allowed_email(s: Session, allowed_id: int) -> bool:
+    row = s.get(m.AllowedEmail, allowed_id)
+    if row is None:
+        return False
+    s.delete(row)
+    return True
+
+
+def seed_allowed_emails_from_env_if_empty(s: Session) -> int:
+    """If the allowed_email table is empty, populate from ALLOWED_EMAILS env var.
+
+    Idempotent: subsequent calls (after the table has at least one row) are a no-op.
+    Returns the number of inserted rows.
+    """
+    from health_connect_web.config import get_settings
+
+    existing = s.execute(select(func.count()).select_from(m.AllowedEmail)).scalar() or 0
+    if existing:
+        return 0
+    settings = get_settings()
+    emails = [e for e in settings.allowed_emails_list if e]
+    if not emails:
+        return 0
+    now = datetime.now(UTC)
+    for e in emails:
+        s.add(m.AllowedEmail(email=e, added_at=now, added_by="env-seed"))
+    s.flush()
+    return len(emails)
+
+
 # (label, model, primary timestamp column) per Health-Connect-sourced table we surface.
 _FRESHNESS_SOURCES: list[tuple[str, Any, Any]] = [
     ("Blood pressure", m.BloodPressure, m.BloodPressure.time),

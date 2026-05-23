@@ -181,6 +181,36 @@ body {
 }
 .kind-tag.kind-drug { background: rgba(224, 124, 124, 0.18); color: var(--bad); }
 .kind-tag.kind-supplement { background: rgba(93, 211, 158, 0.18); color: var(--good); }
+
+/* /admin form */
+.admin-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.admin-form input[type="email"],
+.admin-form input[type="text"] {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 14px;
+  min-width: 240px;
+}
+.admin-form input:focus { outline: none; border-color: var(--accent); }
+.btn-danger {
+  background: rgba(224, 124, 124, 0.15);
+  color: var(--bad);
+  border: 1px solid var(--bad);
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.btn-danger:hover { background: rgba(224, 124, 124, 0.3); }
 /* Morning blend = OJ-orange. More saturated + opaque than the other tags so the
    day/night split reads at a glance on the /teas page. */
 .kind-tag.kind-morning { background: rgba(255, 140, 0, 0.28); color: #ffb347; }

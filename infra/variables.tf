@@ -49,7 +49,7 @@ variable "owner_email" {
 variable "allowed_emails" {
   description = "Additional emails allowed to view the site (Google OAuth allowlist). Owner is implicit."
   type        = list(string)
-  default     = ["joeaguirre0@yahoo.com", "joeaguirre@khatnid.com", "catnip447@gmail.com", "zoepepe02@gmail.com"]
+  default     = ["joeaguirre0@yahoo.com", "joeaguirre@khatnid.com", "catnip447@gmail.com", "zoepepe02@gmail.com", "brandon.sterne@gmail.com"]
 }
 
 variable "drive_folder_id" {

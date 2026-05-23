@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Admin | Health Portfolio{% endblock %}
+{% block content %}
+<h1>Admin</h1>
+<p class="muted">Owner-only. Manage who can sign in to the portfolio. The owner ({{ owner_email }}) is implicitly allowed and isn't shown here.</p>
+
+{% if flash %}
+  <p class="alert" style="background: rgba(78, 161, 255, 0.18); color: var(--accent); padding: 8px 12px; border-radius: 4px;">{{ flash }}</p>
+{% endif %}
+
+<section class="schedule-section">
+  <h2>Add user</h2>
+  <form action="{{ url_for('admin_add_email') }}" method="post" class="admin-form">
+    <input type="email" name="email" required placeholder="user@example.com" autocomplete="off">
+    <input type="text" name="note" placeholder="optional note (e.g. 'my GP')" autocomplete="off">
+    <button type="submit" class="btn-secondary">Add</button>
+  </form>
+</section>
+
+<section class="schedule-section">
+  <h2>Allowed users ({{ allowed | length }})</h2>
+  {% if allowed %}
+  <table class="data-table">
+    <thead>
+      <tr>
+        <th>Email</th>
+        <th>Note</th>
+        <th>Added by</th>
+        <th>Added</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ae in allowed %}
+        <tr>
+          <td><strong>{{ ae.email }}</strong></td>
+          <td>{{ ae.note or '' }}</td>
+          <td class="muted small">{{ ae.added_by or '' }}</td>
+          <td class="muted small">{{ ae.added_at.strftime('%Y-%m-%d') }}</td>
+          <td>
+            <form action="{{ url_for('admin_remove_email', allowed_id=ae.id) }}"
+                  method="post"
+                  style="display:inline;"
+                  onsubmit="return confirm('Remove {{ ae.email }}?');">
+              <button type="submit" class="btn-danger">Remove</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+    <p class="muted">No users yet. Add one above.</p>
+  {% endif %}
+</section>
+{% endblock %}
