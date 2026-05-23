@@ -20,6 +20,9 @@
       <a href="{{ url_for('page_teas') }}" class="{% if request.url.path == '/teas' %}active{% endif %}">Teas</a>
       <a href="{{ url_for('page_schedule') }}" class="{% if request.url.path == '/schedule' %}active{% endif %}">Schedule</a>
       <a href="{{ url_for('page_data') }}" class="{% if request.url.path == '/data' %}active{% endif %}">Data</a>
+      {% if user and user.email and user.email | lower == owner_email %}
+        <a href="{{ url_for('page_admin') }}" class="{% if request.url.path.startswith('/admin') %}active{% endif %}">Admin</a>
+      {% endif %}
     </nav>
     <div class="user">
       <span class="user-name">{{ user.name }}</span>

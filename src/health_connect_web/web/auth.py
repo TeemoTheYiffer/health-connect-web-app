@@ -65,13 +65,33 @@ def require_owner(user: dict[str, Any] = Depends(require_user)) -> dict[str, Any
     return user
 
 
+def _is_email_allowed(email: str) -> bool:
+    """Owner is always allowed. Then we union the env-var allowlist (config fallback)
+    with the DB allowlist managed via /admin. Using a fresh session_scope so this
+    runs in the OAuth callback without needing FastAPI's Depends machinery.
+    """
+    s = get_settings()
+    e = email.strip().lower()
+    if not e:
+        return False
+    if s.owner_email.strip().lower() == e:
+        return True
+    if e in s.allowed_emails_list:
+        return True
+    # DB-managed allowlist.
+    from health_connect_web.db import session_scope
+    from health_connect_web.web.queries import is_email_in_db_allowlist
+
+    with session_scope() as db:
+        return is_email_in_db_allowlist(db, e)
+
+
 async def login_redirect(request: Request) -> RedirectResponse:
     redirect_uri = request.url_for("auth_callback")
     return await get_oauth().google.authorize_redirect(request, str(redirect_uri))
 
 
 async def handle_callback(request: Request) -> RedirectResponse:
-    s = get_settings()
     try:
         token = await get_oauth().google.authorize_access_token(request)
     except OAuthError as e:
@@ -86,7 +106,7 @@ async def handle_callback(request: Request) -> RedirectResponse:
     if not email or not userinfo.get("email_verified", True):
         return RedirectResponse(url="/login?error=email", status_code=status.HTTP_303_SEE_OTHER)
 
-    if not s.is_email_allowed(email):
+    if not _is_email_allowed(email):
         # Stash a minimal identity to render the friendly /forbidden page.
         request.session["pending_user"] = {"email": email, "name": name}
         return RedirectResponse(url="/forbidden", status_code=status.HTTP_303_SEE_OTHER)

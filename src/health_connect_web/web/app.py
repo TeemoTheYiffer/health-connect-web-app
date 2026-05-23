@@ -6,7 +6,7 @@ import logging
 from importlib.resources import files
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Form, Request
 from fastapi.exceptions import HTTPException as FastAPIHTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -38,6 +38,9 @@ def create_app() -> FastAPI:
     pkg = _package_dir()
     templates = Jinja2Templates(directory=str(pkg / "templates"))
     templates.env.globals["app_version"] = __version__
+    # Expose owner email to all templates so the nav can render owner-only links
+    # (currently the Admin tab) without each route having to pass it.
+    templates.env.globals["owner_email"] = settings.owner_email.strip().lower()
 
     app = FastAPI(title="Health Portfolio", version=__version__, docs_url=None, redoc_url=None)
     app.add_middleware(
@@ -50,6 +53,14 @@ def create_app() -> FastAPI:
 
     # Ensure tables exist. Safe in dev; in prod, prefer running `hcw-sync --init-db` once first.
     create_all()
+
+    # First-run bootstrap: seed the allowed_email table from the ALLOWED_EMAILS env
+    # var if the table is currently empty. After this, the env var is only a
+    # fallback; ongoing changes happen via the /admin UI.
+    from health_connect_web.db import session_scope
+
+    with session_scope() as _seed_db:
+        queries.seed_allowed_emails_from_env_if_empty(_seed_db)
 
     @app.exception_handler(FastAPIHTTPException)
     async def _redirect_303(request: Request, exc: FastAPIHTTPException):
@@ -267,6 +278,58 @@ def create_app() -> FastAPI:
     @app.get("/vitamins")
     async def vitamins_redirect():
         return RedirectResponse(url="/supplements", status_code=308)
+
+    # ---- Admin (owner-only) ----
+
+    @app.get("/admin", response_class=HTMLResponse, name="page_admin")
+    async def page_admin(
+        request: Request,
+        user: dict = Depends(auth.require_owner),
+        db: Session = Depends(get_db),
+    ):
+        return templates.TemplateResponse(
+            request,
+            "admin.html",
+            {
+                "user": user,
+                "allowed": queries.list_allowed_emails(db),
+                "flash": request.query_params.get("flash"),
+            },
+        )
+
+    @app.post("/admin/allowed_emails", name="admin_add_email")
+    async def admin_add_email(
+        email: str = Form(...),
+        note: str | None = Form(None),
+        user: dict = Depends(auth.require_owner),
+        db: Session = Depends(get_db),
+    ):
+        from sqlalchemy.exc import IntegrityError
+
+        e = (email or "").strip().lower()
+        if not e or "@" not in e:
+            return RedirectResponse(url="/admin?flash=Invalid+email", status_code=303)
+        if e == get_settings().owner_email.strip().lower():
+            return RedirectResponse(url="/admin?flash=Owner+is+already+implicitly+allowed", status_code=303)
+        try:
+            queries.add_allowed_email(db, e, added_by=user.get("email"), note=note or None)
+            db.commit()
+        except IntegrityError:
+            db.rollback()
+            return RedirectResponse(url=f"/admin?flash=Already+allowed:+{e}", status_code=303)
+        return RedirectResponse(url=f"/admin?flash=Added+{e}", status_code=303)
+
+    @app.post("/admin/allowed_emails/{allowed_id}/delete", name="admin_remove_email")
+    async def admin_remove_email(
+        allowed_id: int,
+        user: dict = Depends(auth.require_owner),
+        db: Session = Depends(get_db),
+    ):
+        _ = user
+        ok = queries.remove_allowed_email(db, allowed_id)
+        db.commit()
+        msg = "Removed" if ok else "Not+found"
+        return RedirectResponse(url=f"/admin?flash={msg}", status_code=303)
 
     return app
 

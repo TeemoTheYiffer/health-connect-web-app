@@ -307,6 +307,26 @@ class Vitamin(Base):
     sort_order: Mapped[int] = mapped_column(Integer, default=0)
 
 
+# ---------- Allowlist (runtime-managed via /admin) ----------
+
+
+class AllowedEmail(Base):
+    """An email that can sign in to the portfolio.
+
+    Seeded once from the `ALLOWED_EMAILS` env var on first startup, then mutated
+    at runtime via the /admin page. The owner email (from `OWNER_EMAIL`) is
+    always allowed implicitly and isn't stored here.
+    """
+
+    __tablename__ = "allowed_email"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    email: Mapped[str] = mapped_column(String(255), unique=True, nullable=False, index=True)
+    added_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    added_by: Mapped[str | None] = mapped_column(String(255))  # owner email that added them, or 'env-seed'
+    note: Mapped[str | None] = mapped_column(Text)
+
+
 # ---------- Sync metadata ----------
 
 
