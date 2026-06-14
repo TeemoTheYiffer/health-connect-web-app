@@ -581,23 +581,40 @@ def steps_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
     return {"labels": [str(r.d) for r in rows], "values": [int(r.n or 0) for r in rows]}
 
 
-def calories_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
-    end = s.execute(select(func.max(m.TotalCalories.start_time))).scalar()
-    if end is None:
-        return {"labels": [], "values": []}
+def energy_balance_chart_payload(s: Session, days: int = 7) -> dict[str, list]:
+    """Daily calories consumed (food) vs burned (total expenditure), in kcal, on a shared date axis.
+
+    Anchors the window to the most recent day that has either kind of reading, so the chart
+    stays populated when one source lags the other. A day missing one series is None (Chart.js
+    leaves a gap rather than plotting it as zero).
+    """
+    burned_end = s.execute(select(func.max(m.TotalCalories.start_time))).scalar()
+    consumed_end = s.execute(select(func.max(m.Nutrition.start_time))).scalar()
+    ends = [e for e in (burned_end, consumed_end) if e is not None]
+    if not ends:
+        return {"labels": [], "consumed": [], "burned": []}
+    end = max(ends)
     start = end - timedelta(days=days)
-    rows = s.execute(
-        select(
-            func.date(m.TotalCalories.start_time).label("d"),
-            func.sum(m.TotalCalories.energy_cal).label("e"),
-        )
-        .where(m.TotalCalories.start_time >= start, m.TotalCalories.start_time <= end)
-        .group_by(func.date(m.TotalCalories.start_time))
-        .order_by(func.date(m.TotalCalories.start_time))
-    ).all()
+
+    def _daily_sum(time_col, energy_col) -> dict:
+        rows = s.execute(
+            select(func.date(time_col), func.sum(energy_col))
+            .where(time_col >= start, time_col <= end)
+            .group_by(func.date(time_col))
+        ).all()
+        return {d: e for d, e in rows}
+
+    burned = _daily_sum(m.TotalCalories.start_time, m.TotalCalories.energy_cal)
+    consumed = _daily_sum(m.Nutrition.start_time, m.Nutrition.energy_cal)
+    labels = sorted(set(burned) | set(consumed))
+
+    def _kcal(v):
+        return None if v is None else round(v / 1000.0, 0)
+
     return {
-        "labels": [str(r.d) for r in rows],
-        "values": [round((r.e or 0) / 1000.0, 0) for r in rows],
+        "labels": [str(d) for d in labels],
+        "consumed": [_kcal(consumed.get(d)) for d in labels],
+        "burned": [_kcal(burned.get(d)) for d in labels],
     }
 
 
@@ -613,7 +630,7 @@ HEALTH_CHART_BUILDERS = {
     "bp": bp_chart_payload,
     "weight": weight_chart_payload,
     "steps": steps_chart_payload,
-    "calories": calories_chart_payload,
+    "energy": energy_balance_chart_payload,
     "rhr": rhr_chart_payload,
 }
 

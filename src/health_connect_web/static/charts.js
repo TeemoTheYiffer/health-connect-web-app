@@ -69,7 +69,10 @@
         { label: "Weight (kg)", data: p.kg, borderColor: "#5dd39e", backgroundColor: "rgba(93,211,158,0.2)", tension: 0.2 },
       ]),
       stepsChart: (id, p) => barChart(id, p.labels, "Steps", p.values, "#4ea1ff"),
-      caloriesChart: (id, p) => barChart(id, p.labels, "kcal", p.values, "#f4b860"),
+      energyChart: (id, p) => lineChart(id, p.labels, [
+        { label: "Consumed", data: p.consumed, borderColor: "#f4b860", backgroundColor: "rgba(244,184,96,0.2)", tension: 0.2 },
+        { label: "Burned", data: p.burned, borderColor: "#e07c7c", backgroundColor: "rgba(224,124,124,0.2)", tension: 0.2 },
+      ]),
       rhrChart: (id, p) => lineChart(id, p.labels, [
         { label: "Resting HR", data: p.values, borderColor: "#5dd39e", backgroundColor: "rgba(93,211,158,0.2)", tension: 0.2 },
       ]),
@@ -86,7 +89,7 @@
       bpChart: "bpData",
       weightChart: "weightData",
       stepsChart: "stepsData",
-      caloriesChart: "caloriesData",
+      energyChart: "energyData",
       rhrChart: "rhrData",
       macrosChart: "macrosData",
     };
